@@ -6,9 +6,6 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
                 <ion-title slot="start">課程表</ion-title>
-                <!-- <ion-button slot="end">
-                    <ion-icon :icon="add"></ion-icon>
-                </ion-button> -->
                 <ion-select label-placement="stacked" label="學校" value="school001" slot="end" class="CalendarCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
                     <ion-select-option value="school001">師大附中</ion-select-option>
@@ -20,12 +17,9 @@
                     <ion-select-option value="class001">一年三班</ion-select-option>
                     <ion-select-option value="class001">二年四班</ion-select-option>
                 </ion-select>
-
-                <ion-select label-placement="stacked" label="裝置" value="device001" slot="end" class="CalendarCommonSelectOption CalendarDeviceOption">
-                    <ion-icon slot="start" :icon="hardwareChip" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="device001">hsntnu-0103</ion-select-option>
-                    <ion-select-option value="device001">hsntnu-02034</ion-select-option>
-                </ion-select>
+                <ion-button slot="end"  @click="openChat">
+                    <ion-icon :icon="chatboxEllipses"></ion-icon>
+                </ion-button>
 
             </ion-toolbar>
         </ion-header>
@@ -39,37 +33,40 @@
         <ion-content :id="contentId">
             <full-calendar ref="calendarRef" :options="calendarOptions"></full-calendar>
             <!-- 侧边菜单 -->
-      <ion-menu side="end" :content-id="contentId" type="overlay" menu-id="courseMenu">
+            <ion-menu side="end" :content-id="contentId" type="overlay" style="--width:35%" menu-id="chatMenu">
         <ion-header>
-          <ion-toolbar>
-            <ion-title>課程詳情</ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content>
-          <div class="detail-pane" v-if="selectedCourse">
-            <h2>{{ selectedCourse.title }}</h2>
-            <p>授課老師: 蘇小鳴</p>
-            <p>課程時間: {{ formatDate(selectedCourse.start) }} - {{ formatDate(selectedCourse.end) }}</p>
-            <p color="success">狀態: <ion-text color="success">完成</ion-text></p>
-            <ion-button expand="full">
-                    <ion-icon :icon="eye" @click="enterCourse"></ion-icon>
-                </ion-button>
-                <ion-button color="danger"  expand="full">
-                    <ion-icon :icon="closeCircle" @click="enterCourse"></ion-icon>
-                </ion-button>
+        <ion-toolbar color="primary">
+          <ion-title>AI助理</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+      <!-- Toggle Menu -->
+      <!-- 聊天区域 -->
+        <div class="messages">
+          <div v-for="(msg, index) in messages" :key="index" >
+            <div :class="['message', msg.sender]">
+                <div v-if="msg.sender==='ai'" :class="['message-name', msg.sender]">{{ msg.name }}</div>
+                <div class="message-content">
+                {{ msg.text }}
+                </div> 
+            </div>
           </div>
-        </ion-content>
-      </ion-menu>
-
-      <!-- 隐藏的按钮，用于程序化打开菜单 -->
-      <ion-menu-toggle auto-hide="false">
+          <div ref="messagesEndRef"></div>
+        </div>
+        <!-- 输入框 -->
+        <div class="input-area">
+          <ion-item>
+            <ion-input placeholder="输入訊息..." @keyup.enter="sendMessage"></ion-input>
+            <ion-button slot="end" @click="sendMessage">
+              <ion-icon :icon="send"></ion-icon>
+            </ion-button>
+          </ion-item>
+      </div>
+      </ion-content>
+    </ion-menu>
+    <ion-menu-toggle auto-hide="false">
         <ion-button id="open-menu" style="display: none;"></ion-button>
       </ion-menu-toggle>
-            <ion-fab  slot="fixed" vertical="bottom" horizontal="end">
-                <ion-fab-button>
-                <ion-icon :icon="add"></ion-icon>
-                </ion-fab-button>
-            </ion-fab>
         </ion-content>
     </ion-page>
 </template>
@@ -85,20 +82,20 @@ import {
     IonSelectOption,
     IonSelect,
     IonIcon,
-    IonFab,
-    IonFabButton,
     IonMenuToggle,
     IonMenu,
-    IonText,
+    IonInput,
     IonButtons,
     IonMenuButton,
-    IonRouterOutlet
+    IonRouterOutlet,
+    IonItem
+
 } from '@ionic/vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import { ref, onMounted } from 'vue';
-import { business,people,hardwareChip,add, eye, closeCircle} from 'ionicons/icons';
+import { business,people,chatboxEllipses, send} from 'ionicons/icons';
 import { menuController } from '@ionic/vue';
 import ToggleMenu from '@/components/menu.vue';
 
@@ -125,7 +122,7 @@ const calendarOptions = {
 // 生成一個月內每週重複的課程
 const courses = [
     { title: '數學', startTime: '2024-09-30:10:00:00', endTime: '2024-09-30:13:50:00' },
-    { title: '理化', startTime: '2024-09-30:14:00:00', endTime: '2024-09-30:14:50:00' },
+    { title: '生物', startTime: '2024-09-30:14:00:00', endTime: '2024-09-30:14:50:00' },
 
     { title: '國語文', startTime: '2024-10-01:08:10:00', endTime: '2024-10-01:10:00:00' },
     { title: '理化', startTime: '2024-10-01:10:10:00', endTime: '2024-10-01:12:00:00' },
@@ -147,8 +144,15 @@ const courses = [
     { title: '歷史', startTime: '2024-10-04:13:00:00', endTime: '2024-10-04:13:50:00' },
 ];
 
+const messages = ref([
+    {text: "你是誰?​", sender: 'user'},
+    {text: "我是AI智能助手，專門用來幫助搜尋和回答與學習、課程相關的問題。我可以根據您的需求提供各種資訊，包括課業輔助、解答問題、搜尋資料等，幫助您更好地理解和學習。如果有任何問題，請隨時告訴我！", sender: 'ai', "name":"A.I."},
+    {text: "我要找光合作用相關的課程", sender: 'user'},
+    {text: "在9月30號的下午2:00的生物課有教授關於光合作用的內容，請點擊此<連結>觀看筆記", sender: 'ai', "name":"A.I."},
+  ]);
 
-for (let i = 0; i < 4; ++i) {
+
+for (let i = 0; i < 2; ++i) {
     courses.forEach(course => {
         let title = course.title;
         let start = new Date(course.startTime);
@@ -195,17 +199,16 @@ async function handleEventClick(info) {
   };
 
   // 打开右侧菜单
-  await menuController.open('courseMenu');
+  //await menuController.open('courseMenu');
 }
 
-function formatDate(date) {
-  const options = { hour12: false, hour: '2-digit', minute: '2-digit' };
-  return new Intl.DateTimeFormat('zh-CN', options).format(date);
+function openChat(){
+    menuController.open("chatMenu");
 }
 
-function enterCourse() {
-  alert('进入课程：' + selectedCourse.value.title);
-  // 实现进入课程的逻辑
+function sendMessage(){
+    messages.push({text: "fewfw", sender: 'user'});
+    scrollToBottom();
 }
 
 onMounted(() => {
@@ -248,6 +251,59 @@ ion-menu {
 }
 ion-content {
   --offset-end: 0px;
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.ai {
+  justify-content: flex-start;
+}
+
+.message-content {
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.message.user .message-content {
+  background-color: #007aff;
+  color: #ffffff;
+}
+
+.message.ai .message-content {
+  background-color: #e5e5ea;
+  color: #000000;
+}
+
+.input-area {
+  padding: 10px;
+  background-color: #f1f1f1;
+}
+
+.message-name.ai {
+    color: #65676b;
+    font-size: 0.75rem;
+    margin-top: auto;
+    margin-bottom: 0px;
 }
 
 </style>

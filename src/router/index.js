@@ -1,6 +1,13 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Meeting from '../views/calendar.vue';
 import Device from '../views/device.vue';
+import Classification from '../views/classification.vue';
+import Note from '../views/note.vue';
+import Home from '../views/home.vue';
+import Login from '../views/login.vue';
+import CalendarNote from '../views/calendar_note.vue';
+import Schools from '../views/schools.vue';
+import account from '../views/account.vue';
 
 const routes = [
   {
@@ -10,13 +17,49 @@ const routes = [
   {
     path: '/calendar',
     name: 'Calendar',
-    component: Meeting//HomePage
+    component: Meeting
   },
   {
     path: '/device',
     name: 'Device',
-    component: Device//HomePage
-  }
+    component: Device
+  },
+    {
+        path: '/classification',
+        name: 'Classification',
+        component: Classification
+    }
+    ,
+    {
+        path: '/note',
+        name: 'Note',
+        component: Note
+    },
+    {
+        path: '/home',
+        name: 'Home',
+        component: Home
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: Login
+    },
+    {
+        path: '/calendar_note',
+        name: 'CalendarNote',
+        component: CalendarNote
+    },
+    {
+        path: '/schools',
+        name: 'Schools',
+        component: Schools
+    },
+    {
+        path: '/account',
+        name: 'account',
+        component: account
+    }
 ]
 
 const router = createRouter({

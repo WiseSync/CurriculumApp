@@ -2,9 +2,9 @@
     <ion-page>
       <ion-header>
         <ion-toolbar>
-            <ion-button slot="start">
-                    <ion-icon :icon="home"></ion-icon>
-                </ion-button>
+            <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
           <ion-title slot="start">裝置管理</ion-title>
           <ion-select label-placement="stacked" label="學校" value="all" slot="end" class="DeviceCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
@@ -15,12 +15,18 @@
                 <ion-select label-placement="stacked" label="狀態" value="all" slot="end" class="DeviceCommonSelectOption DeviceStatsOption">
                     <ion-icon slot="start" :icon="statsChart" aria-hidden="true"></ion-icon>
                     <ion-select-option value="all">全部</ion-select-option>
-                    <ion-select-option value="device001">連線中</ion-select-option>
+                    <ion-select-option value="device001">離線中</ion-select-option>
                     <ion-select-option value="device001">待機中</ion-select-option>
                 </ion-select>
         </ion-toolbar>
       </ion-header>
-  
+      <ToggleMenu
+      :content-id="contentId"
+      :account-name="accountName"
+      :account-type="accountType"
+      :version="version"
+    ></ToggleMenu>
+    <ion-router-outlet :id="contentId"></ion-router-outlet>
       <ion-content>
         <ion-grid>
           <ion-row>
@@ -71,13 +77,19 @@
     IonBadge,
     IonIcon,
     IonSelectOption,
-    IonSelect
+    IonSelect,
+    IonButtons,
+    IonMenuButton,
+    IonRouterOutlet
   } from '@ionic/vue';
-  import { useRouter } from 'vue-router';
   import { hardwareChip } from 'ionicons/icons';
-  import { business,statsChart, home} from 'ionicons/icons';
+  import { business,statsChart, menu} from 'ionicons/icons';
+  import ToggleMenu from '@/components/menu.vue';
   
-  const router = useRouter();
+  const contentId = ref('menu-content');
+    const accountName = ref('蘇小鳴');
+    const accountType = ref('教師');
+    const version = ref('0.0.1');
   
   const devices = ref([
     {
@@ -102,7 +114,7 @@
       name: 'hsntnu-0105',
       school: '師大附中',
       class: '一年五班',
-      status: '連線中',
+      status: '離線中',
     },
     {
       id: 4,
@@ -182,7 +194,7 @@
       name: 'yphs-0103',
       school: '永平高中',
       class: '一年三班',
-      status: '連線中',
+      status: '離線中',
     },
     {
       id: 4,
@@ -249,8 +261,8 @@
         return 'medium';
       case '錄音中':
         return 'success';
-      case '連線中':
-        return 'primary';
+      case '離線中':
+        return 'warning';
       case '故障中':
         return 'danger';
       default:
