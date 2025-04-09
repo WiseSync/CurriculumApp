@@ -19,8 +19,18 @@ import '@ionic/vue/css/text-alignment.css';
 import '@ionic/vue/css/text-transformation.css';
 import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
+import { alertController } from '@ionic/vue';
 /* Theme variables */
 //import './theme/variables.css';
+
+async function showWarningDialog(msg){
+    const alert = await alertController.create({
+        header: '發收未處理錯誤',
+        message: msg,
+        buttons: ["確定"]
+      });
+      await alert.present();
+}
 
 const app = createApp(App)
   .use(IonicVue)
@@ -29,3 +39,22 @@ const app = createApp(App)
 router.isReady().then(() => {
   app.mount('#app');
 });
+
+// Global error handler for Vue 3
+app.config.errorHandler = (err, instance, info) => {
+    console.error('[Vue Error Handler]', err, info);
+    // Show it in an alert
+    showWarningDialog(err.message || String(err));
+  };
+  
+  // Optionally handle unhandled rejections (promise-based)
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('[unhandledrejection]', event.reason);
+    showWarningDialog(event.reason?.message || String(event.reason));
+  });
+  
+  // You can also catch raw window error
+  window.addEventListener('error', (event) => {
+    console.error('[window.onerror]', event.error);
+    showWarningDialog(event.error?.message || String(event.error));
+  });

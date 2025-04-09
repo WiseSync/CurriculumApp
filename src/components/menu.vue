@@ -12,8 +12,8 @@
             <ion-icon slot="start" :icon="homeIcon"></ion-icon>
             <ion-label>返回首頁</ion-label>
           </ion-item>
-  
-          <!-- 帐号信息 -->
+          
+          <!--
           <ion-item>
             <ion-icon slot="start" :icon="personIcon"></ion-icon>
             <ion-label>
@@ -22,12 +22,11 @@
             </ion-label>
           </ion-item>
   
-          <!-- 登出 -->
           <ion-item button @click="logout">
             <ion-icon slot="start" :icon="logOutIcon"></ion-icon>
             <ion-label>登出</ion-label>
           </ion-item>
-  
+          -->
           <!-- 版本号 -->
           <ion-item>
             <ion-icon slot="start" :icon="informationIcon"></ion-icon>
@@ -59,25 +58,17 @@
     logOut as logOutIcon,
     informationCircle as informationIcon,
   } from 'ionicons/icons';
+
+  const accountName = ref('使用者名稱'); // 使用者名稱{
+  const accountType = ref('admin'); // 使用者類型
+  const version = ref('1.0.0'); // 版本號
   
   // 接收父组件传递的属性
   const props = defineProps({
     contentId: {
       type: String,
       required: true,
-    },
-    accountName: {
-      type: String,
-      required: true,
-    },
-    accountType: {
-      type: String,
-      required: true,
-    },
-    version: {
-      type: String,
-      default: '1.0.0',
-    },
+    }
   });
   
   const router = useRouter();

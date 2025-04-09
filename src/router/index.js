@@ -1,18 +1,24 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Meeting from '../views/calendar.vue';
 import Device from '../views/device.vue';
-import Classification from '../views/classification.vue';
+import Alignment from '../views/alignment.vue';
 import Note from '../views/note.vue';
 import Home from '../views/home.vue';
 import Login from '../views/login.vue';
 import CalendarNote from '../views/calendar_note.vue';
 import Schools from '../views/schools.vue';
 import account from '../views/account.vue';
+import List from '../views/list.vue';
 
 const routes = [
   {
     path: '/',
     redirect: '/calendar'
+  },
+  {
+    path: '/list',
+    name: 'List',
+    component: List
   },
   {
     path: '/calendar',
@@ -25,13 +31,13 @@ const routes = [
     component: Device
   },
     {
-        path: '/classification',
-        name: 'Classification',
-        component: Classification
+        path: '/alignment/:sessionId(\\d+)',
+        name: 'Alignment',
+        component: Alignment
     }
     ,
     {
-        path: '/note',
+        path: '/note/:sessionId(\\d+)',
         name: 'Note',
         component: Note
     },

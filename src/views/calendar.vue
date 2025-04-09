@@ -9,22 +9,19 @@
                 <!-- <ion-button slot="end">
                     <ion-icon :icon="add"></ion-icon>
                 </ion-button> -->
-                <ion-select label-placement="stacked" label="學校" value="school001" slot="end" class="CalendarCommonSelectOption">
+                <ion-select label-placement="stacked" label="組織" value="school001" slot="end" class="CalendarCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="school001">師大附中</ion-select-option>
-                    <ion-select-option value="school002">永平高中</ion-select-option>
+                    <ion-select-option value="school001">國家教育研究院</ion-select-option>
                 </ion-select>
 
                 <ion-select label-placement="stacked" label="班級" value="class001" slot="end" class="CalendarCommonSelectOption">
                     <ion-icon slot="start" :icon="people" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="class001">一年三班</ion-select-option>
-                    <ion-select-option value="class001">二年四班</ion-select-option>
+                    <ion-select-option value="class001">測評中心</ion-select-option>
                 </ion-select>
 
                 <ion-select label-placement="stacked" label="裝置" value="device001" slot="end" class="CalendarCommonSelectOption CalendarDeviceOption">
                     <ion-icon slot="start" :icon="hardwareChip" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="device001">hsntnu-0103</ion-select-option>
-                    <ion-select-option value="device001">hsntnu-02034</ion-select-option>
+                    <ion-select-option value="device001">YouTube</ion-select-option>
                 </ion-select>
 
             </ion-toolbar>
@@ -48,14 +45,13 @@
         <ion-content>
           <div class="detail-pane" v-if="selectedCourse">
             <h2>{{ selectedCourse.title }}</h2>
-            <p>授課老師: 蘇小鳴</p>
+            <p>授課老師:{{selectedCourse.extendedProps.teacher}}</p>
+            <p>科目: {{ Utils.subjectText(selectedCourse.extendedProps.subject) }}</p>
             <p>課程時間: {{ formatDate(selectedCourse.start) }} - {{ formatDate(selectedCourse.end) }}</p>
-            <p color="success">狀態: <ion-text color="success">完成</ion-text></p>
-            <ion-button expand="full">
-                    <ion-icon :icon="eye" @click="enterCourse"></ion-icon>
-                </ion-button>
-                <ion-button color="danger"  expand="full">
-                    <ion-icon :icon="closeCircle" @click="enterCourse"></ion-icon>
+            <p color="success">狀態: <ion-text :color="Utils.statusColor(selectedCourse.extendedProps.status)">{{ Utils.statusText(selectedCourse.extendedProps.status) }}</ion-text></p>
+            <ion-button expand="full"  @click="enterCourse" :disabled="selectedCourse.extendedProps.status !== 'done'">
+                    <ion-icon :icon="eye"></ion-icon>
+                    <ion-label>進入課程</ion-label>
                 </ion-button>
           </div>
         </ion-content>
@@ -66,11 +62,12 @@
         <ion-button id="open-menu" style="display: none;"></ion-button>
       </ion-menu-toggle>
             <ion-fab  slot="fixed" vertical="bottom" horizontal="end">
-                <ion-fab-button>
+                <ion-fab-button @click="addVideoDialog.show()">
                 <ion-icon :icon="add"></ion-icon>
                 </ion-fab-button>
             </ion-fab>
         </ion-content>
+        <add_video ref="addVideoDialog" @onHide="refreshCalendar"/>
     </ion-page>
 </template>
 
@@ -92,7 +89,8 @@ import {
     IonText,
     IonButtons,
     IonMenuButton,
-    IonRouterOutlet
+    IonRouterOutlet,
+    IonLabel
 } from '@ionic/vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -101,6 +99,10 @@ import { ref, onMounted } from 'vue';
 import { business,people,hardwareChip,add, eye, closeCircle} from 'ionicons/icons';
 import { menuController } from '@ionic/vue';
 import ToggleMenu from '@/components/menu.vue';
+import AppConfig from '../app_config';
+import Utils from '../utils';
+import add_video from '../components/add_video.vue';
+import { useRouter } from 'vue-router';
 
 const calendarRef = ref(null);
 const selectedCourse = ref(null);
@@ -108,91 +110,72 @@ const contentId = 'main-content';
 const accountName = '王小明';
 const accountType = '教師';
 const version = '0.0.1';
+const addVideoDialog = ref(null);
+const router = useRouter();
+
+
 
 const calendarOptions = {
     plugins: [dayGridPlugin, timeGridPlugin],
     initialView: 'dayGridMonth',
-    locale: 'zh-tw',
+    locale: 'zh-TW',
     headerToolbar: {
         left: 'prev,next today',
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
     },
-    events: [],
+    events: function(fetchInfo, successCallback, failureCallback) {
+        // 這裡可以從 API 獲取事件數據
+        // 這裡我們使用 loadVideosAsCourses 函數來獲取事件數據
+        fetchCourses().then((events) => {
+            successCallback(events);
+        }).catch(failureCallback);
+    },
     eventClick: handleEventClick, // 事件點擊處理器
 };
 
-// 生成一個月內每週重複的課程
-const courses = [
-    { title: '數學', startTime: '2024-09-30:10:00:00', endTime: '2024-09-30:13:50:00' },
-    { title: '理化', startTime: '2024-09-30:14:00:00', endTime: '2024-09-30:14:50:00' },
+async function refreshCalendar() {
+    const calendarApi = calendarRef.value.getApi();
+    // 重新獲取事件數據
+    calendarApi.refetchEvents();
+}
 
-    { title: '國語文', startTime: '2024-10-01:08:10:00', endTime: '2024-10-01:10:00:00' },
-    { title: '理化', startTime: '2024-10-01:10:10:00', endTime: '2024-10-01:12:00:00' },
-    { title: '數學', startTime: '2024-10-01:13:00:00', endTime: '2024-10-01:13:50:00' },
-    { title: '英語文', startTime: '2024-10-01:14:00:00', endTime: '2024-10-01:14:20:00' },
-
-    { title: '國語文', startTime: '2024-10-02:08:10:00', endTime: '2024-10-02:09:00:00' },
-    { title: '理化', startTime: '2024-10-02:09:10:00', endTime: '2024-10-02:10:00:00' },
-    { title: '英語文', startTime: '2024-10-02:10:00:00', endTime: '2024-10-02:11:00:00' },
-    { title: '歷史', startTime: '2024-10-02:15:05:00', endTime: '2024-10-02:15:55:00' },
-
-
-    { title: '國語文', startTime: '2024-10-03:9:10:00', endTime: '2024-10-03:10:00:00' },
-    { title: '英語文', startTime: '2024-10-03:13:00:00', endTime: '2024-10-03:13:50:00' },
-    { title: '數學', startTime: '2024-10-03:14:00:00', endTime: '2024-10-03:14:50:00' },
-
-    { title: '英語文', startTime: '2024-10-04:10:00:00', endTime: '2024-10-04:11:00:00' },
-    { title: '國語文', startTime: '2024-10-04:11:10:00', endTime: '2024-10-04:12:00:00' },
-    { title: '歷史', startTime: '2024-10-04:13:00:00', endTime: '2024-10-04:13:50:00' },
-];
-
-
-for (let i = 0; i < 4; ++i) {
-    courses.forEach(course => {
-        let title = course.title;
-        let start = new Date(course.startTime);
-        let end = new Date(course.endTime);
-
-        let startEpoch = start.getTime();
-        let endEpoch = end.getTime();
-
-        startEpoch += 7 * 24 * 60 * 60 * 1000 * i; // Add 7 days in milliseconds
-        endEpoch += 7 * 24 * 60 * 60 * 1000 * i; // Add 7 days in milliseconds
-
-        start = new Date(startEpoch);
-        end = new Date(endEpoch);
-
-        if(start.getDate()<=7 || start.getDate()===30){
-            if(course.title==='數學'){
-                title = course.title+'(失敗)';
-            }else{
-                title = course.title+'(完成)';
-            }
+async function fetchCourses() {
+    const resp = await fetch(AppConfig.ServiceUrl+'/sessions')
+    if(!resp.ok) {
+      //console.error('Failed to load videos:', resp.status, resp.statusText)
+      throw new Error('Failed to load videos: ' + resp.status + ' ' + resp.statusText)
+    }
+    const data = await resp.json()
+    // Clear existing events
+    const events = []
+    // For each video from the API, create a FullCalendar event
+    data.forEach(video => {
+      // Use video.date as start date, assume it’s the event start
+      // We'll just guess an end date 1 hour later for demonstration
+      const startDate = new Date(video.date)
+      const endDate = new Date(  startDate.getTime()+ video.duration) // +1 hour
+      
+      events.push({
+        id: video.id,
+        title: video.title||'無標題',
+        start: startDate,
+        end: endDate,
+        extendedProps:{
+            subject: video.subject,
+            teacher: video.teacher,
+            status: video.status,
+            error: video.error
         }
-
-        if(start.getDate()===8 && course.title==='國語文'){
-            title = '國語文(錄音中)';
-        }
-
-        if (start.getDate() !== 10) {
-            calendarOptions.events.push({
-                title: title,
-                start: start.toISOString(),
-                end: end.toISOString(),
-            });
-        }
+      })
     });
+
+    return events;
+
 }
 
 async function handleEventClick(info) {
-  selectedCourse.value = {
-    title: info.event.title,
-    start: info.event.start,
-    end: info.event.end,
-    teacher: info.event.extendedProps.teacher,
-    status: info.event.extendedProps.status,
-  };
+  selectedCourse.value = info.event;
 
   // 打开右侧菜单
   await menuController.open('courseMenu');
@@ -200,20 +183,27 @@ async function handleEventClick(info) {
 
 function formatDate(date) {
   const options = { hour12: false, hour: '2-digit', minute: '2-digit' };
-  return new Intl.DateTimeFormat('zh-CN', options).format(date);
+  return new Intl.DateTimeFormat('zh-TW', options).format(date);
 }
 
 function enterCourse() {
-  alert('进入课程：' + selectedCourse.value.title);
-  // 实现进入课程的逻辑
+    router.push({
+        name: 'Alignment',
+        params: {
+            sessionId: selectedCourse.value.id,
+        }
+    });
 }
 
 onMounted(() => {
     const calendarApi = calendarRef.value.getApi();
-
-    setTimeout(() => {
+    fetchCourses().then(() => {
+        calendarApi.refetchEvents();
         calendarApi.render();
-    }, 8);
+    });
+
+    /*
+    */
 
 });
 </script>
