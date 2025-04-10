@@ -43,4 +43,18 @@ export default class Utils {
         };
         return statusMap[status] || status;
       }
+
+      static isYoutubeUrl(url) {
+        //Check valid YouTube URL
+        const youtubeRegex = new RegExp(
+            '^(https?:\\/\\/)?(www\\.)?(' +
+            // 1) youtube.com/watch? with anything, then v=, then 11 chars, then anything
+            'youtube\\.com\\/watch\\?.*v=[\\w-]{11}.*' +
+            '|' +
+            // 2) short link: youtu.be/ + 11 chars + optional extra
+            'youtu\\.be\\/[\\w-]{11}.*' +
+            ')$'
+        );
+        return youtubeRegex.test(url);
+      }
 }

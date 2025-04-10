@@ -82,6 +82,7 @@ import {
 } from '@ionic/vue';
 import AppConfig from '../app_config';
 import { close } from 'ionicons/icons'; // Import the close icon
+import Utils from '../utils';
 
 const baseApiUrl = AppConfig.ServiceUrl;
 const emits = defineEmits(['onHide', 'onShow']);
@@ -185,7 +186,7 @@ async function submitNewVideo() {
             'youtu\\.be\\/[\\w-]{11}.*' +
             ')$'
         );
-        if (!youtubeRegex.test(newVideoUrl.value)) {
+        if (!Utils.isYoutubeUrl(newVideoUrl.value)) {
             addErrorMessage.value = "請輸入有效的 YouTube 網址";
             return;
         }

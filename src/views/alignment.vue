@@ -48,7 +48,8 @@
         </ion-menu-toggle>
         <ion-content :id="contentId">
             <!-- 显示元数据 -->
-            <ion-card v-if="!showLoading">
+             <div style="display: flex;" ref="playerContainerRef">
+            <ion-card v-if="!showLoading" style="width: 85%;">
                 <ion-card-header>
                     <ion-card-title>{{ metadata.courseName }}</ion-card-title>
                     <!--<ion-card-subtitle>{{ metadata.school }} - {{ metadata.class }}</ion-card-subtitle>-->
@@ -62,6 +63,9 @@
                     <p>裝置 ID: {{ metadata.deviceId }}</p>
                 </ion-card-content>
             </ion-card>
+            <!--<div id="player-container"  style="width: 20%; height: 100%;"/>-->
+            </div>
+            
             <!-- <audio controls :src="'https://file-examples.com/storage/fe2465184067ef97996fb41/2017/11/file_example_MP3_700KB.mp3'" class="classification-audio"></audio>-->
             <!-- 文本内容分段显示 -->
             <ion-item-group v-for="(segment, index) in segments" :key="index" class="segment">
@@ -107,37 +111,10 @@
         <IonLoading :is-open="showLoading" message="載入中..." />
 
         </ion-content>
-        <ion-menu side="end" :content-id="contentId" type="overlay" style="--width:35%" menu-id="chatMenu">
-        <ion-header>
-        <ion-toolbar color="primary">
-          <ion-title>AI助理</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-      <!-- Toggle Menu -->
-      <!-- 聊天区域 -->
-        <div class="messages">
-          <div v-for="(msg, index) in messages" :key="index" >
-            <div :class="['message', msg.sender]">
-                <div v-if="msg.sender==='ai'" :class="['message-name', msg.sender]">{{ msg.name }}</div>
-                <div class="message-content">
-                {{ msg.text }}
-                </div> 
-            </div>
-          </div>
-          <div ref="messagesEndRef"></div>
-        </div>
-        <!-- 输入框 -->
-        <div class="input-area">
-          <ion-item>
-            <ion-input placeholder="输入訊息..." @keyup.enter="sendMessage"></ion-input>
-            <ion-button slot="end" @click="sendMessage">
-              <ion-icon :icon="send"></ion-icon>
-            </ion-button>
-          </ion-item>
-      </div>
-      </ion-content>
-    </ion-menu>
+        <ion-modal :is-open="showChatModal" swipe-to-close="true" presenting-element="ion-router-outlet"
+                @will-dismiss="onChatModalWillDismiss">
+                <ChatBox @closed="onChatModalWillDismiss" :userAvatar="unknownImgUrl" :dialogHistory="chatDialogHistory" />
+            </ion-modal>
     <!--
     <ion-menu-toggle auto-hide="false">
         <ion-button id="open-menu" style="display: none;"></ion-button>
@@ -174,16 +151,18 @@ import {
     IonItemDivider,
     IonLoading,
     alertController,
-    IonInput,
-    IonIcon
+    IonIcon,
+    IonModal
 } from '@ionic/vue';
 import { menuController } from '@ionic/vue';
 import CommonMenu from '@/components/menu.vue';
 import { useRoute } from 'vue-router';
 import AppConfig from '../app_config';
 import { useRouter } from 'vue-router';
-import { send,chatboxEllipses} from 'ionicons/icons';
+import { chatboxEllipses} from 'ionicons/icons';
 import Utils from '../utils';
+import ChatBox from '@/components/ChatBox.vue'; // The second view described below
+import unknownImgUrl from "../../assets/images/unknown.jpeg?url";
 
 const accountName = '蘇小鳴';
 const accountType = '教師';
@@ -192,13 +171,7 @@ const segments = ref([]);
 const showLoading = ref(true);
 const router = useRouter();
 const route = useRoute();
-const messages = ref([
-    {
-        sender: 'ai',
-        name: 'AI助理',
-        text: '您好！有什麼我可以幫助您的嗎？'
-    }
-]);
+const chatDialogHistory = ref([]);
 
 const metadata = ref({
     courseName: '理化',
@@ -213,6 +186,14 @@ const selectedCodes = ref({});
 const selectedSegment = ref(null);
 const selectedCodesType = ref('content');
 const learningCodes = {};
+const playerContainerRef = ref(null);
+// Local state for controlling modal
+const showChatModal = ref(false);
+
+// Callback for IonModal "willDismiss" event
+function onChatModalWillDismiss() {
+    showChatModal.value = false;
+}
 
 
 // 学习内容和学习表现的选项
@@ -220,7 +201,7 @@ const contentId = ref('main-content');
 
 
 function openChat(){
-    menuController.open("chatMenu");
+    showChatModal.value = true;
 }
 
 function filterCodesInEditMenu(event) {
@@ -274,21 +255,6 @@ function isUserSelectedCode(codeId) {
     if (!codes) return false;
     if (!codes[codeId]) return false;
     return codes[codeId].userSelected;
-}
-
-function sendMessage() {
-    const input = document.querySelector('ion-input');
-    const messageText = input.value;
-    if (messageText.trim() === '') return;
-
-    messages.value.push({ text: messageText, sender: 'user' });
-    input.value = '';
-
-    // 模拟 AI 回复
-    setTimeout(() => {
-        messages.value.push({ text: "這是AI的回覆", sender: 'ai', name: 'AI助理' });
-        scrollToBottom();
-    }, 1000);
 }
 
 async function toggleSelection(id) {
@@ -353,6 +319,27 @@ async function fetchSession() {
         metadata.value.startTime = new Date(new Date(data.date).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
         metadata.value.endTime = new Date(new Date(data.date + data.duration).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
         metadata.value.deviceId = "YouTube";
+
+        if(Utils.isYoutubeUrl(data.url)){
+            const vid = getYouTubeId(data.url);
+
+            const player = document.createElement('iframe');
+            player.id = 'video-player';
+            player.style.width = '15%';
+            player.style.marginTop = '0.75em';
+            player.style.marginBottom = '0.75em';
+            //player.style.height = '100%';
+            //player.style.padding = '0.1em';
+            player.src = 'https://www.youtube.com/embed/' + vid;
+            player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+            player.referrerpolicy = 'strict-origin-when-cross-origin';
+            player.allowFullscreen = true;
+
+            playerContainerRef.value.appendChild(player);
+        }
+
+        //youtubePlayerRef.value.src = 'https://www.youtube.com/embed/' + vid + '?si=d07_yddNCh0g8foi';
+
     }
 }
 
@@ -458,6 +445,41 @@ async function fetchLearningPerformances(subject) {
     learningCodes["performance"] = extractAllCodes(data);
 }
 
+/**
+ * Extracts the YouTube Video ID (11 chars) from various YouTube URLs.
+ * Returns null if no valid ID found.
+ *
+ * Supported forms:
+ * 1) https://www.youtube.com/watch?v=XXXXXXXXXXX ... &other=params
+ * 2) https://youtu.be/XXXXXXXXXXX ... ?other=params
+ */
+ function getYouTubeId(url) {
+  try {
+    const parsed = new URL(url.trim());
+
+    // Check short link style: youtu.be/<id>
+    if (parsed.hostname.includes('youtu.be')) {
+      // /XXXXXXXXXXX
+      const path = parsed.pathname.slice(1); // remove leading '/'
+      if (path.length === 11) {
+        return path;
+      }
+      return null;
+    }
+    // Otherwise, assume youtube.com/watch
+    else if (parsed.hostname.includes('youtube.com')) {
+      const vParam = parsed.searchParams.get('v');
+      if (vParam && vParam.length === 11) {
+        return vParam;
+      }
+    }
+    return null;
+  } catch (err) {
+    console.warn('Invalid URL:', err);
+    return null;
+  }
+}
+
 
 onMounted(async () => {
     try{
@@ -465,6 +487,15 @@ onMounted(async () => {
         await fetchSession();
         await fetchLearningContents(metadata.value.subject);
         await fetchLearningPerformances(metadata.value.subject);
+        
+        const fullText = segments.value.map(segment => segment.text).join('');
+
+        chatDialogHistory.value = [{ role: 'system', content: String.raw`你是AI小助手，專門本課內所有相關的知識點，請先熟悉下列授課的逐字稿內容:
+        ### TRANSCRIPTION Start ###
+        ${fullText}
+        ### TRANSCRIPTION End ###
+        請依據逐字稿內容來回答使用者的提問，如果問題超出本課程的範圍，請勿回答。` }];
+
         setTimeout(() => {
             showLoading.value = false;
         }, 18);
@@ -523,57 +554,5 @@ cursor: pointer;
 
 .classification-select-item-title {
     display: flex;
-}
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.message {
-  display: flex;
-  margin-bottom: 10px;
-}
-
-.message.user {
-  justify-content: flex-end;
-}
-
-.message.ai {
-  justify-content: flex-start;
-}
-
-.message-content {
-  padding: 10px;
-  border-radius: 8px;
-  max-width: 80%;
-}
-
-.message.user .message-content {
-  background-color: #007aff;
-  color: #ffffff;
-}
-
-.message.ai .message-content {
-  background-color: #e5e5ea;
-  color: #000000;
-}
-
-.input-area {
-  padding: 10px;
-  background-color: #f1f1f1;
-}
-
-.message-name.ai {
-    color: #65676b;
-    font-size: 0.75rem;
-    margin-top: auto;
-    margin-bottom: 0px;
 }
 </style>
