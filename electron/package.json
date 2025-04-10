@@ -29,14 +29,14 @@
     "electron-updater": "6.3.0",
     "electron-window-state": "^5.0.3",
     "onnxruntime-web": "^1.17.1",
-    "vite-plugin-static-copy": "^1.0.2"
+    "vite-plugin-static-copy": "^2.3.1"
   },
   "devDependencies": {
     "electron": "29.1.5",
     "electron-builder": "^24.13.3",
     "typescript": "^5.0.4",
-    "@vitejs/plugin-legacy": "^5.3.2",
-    "@vitejs/plugin-vue": "5.0.4"
+    "@vitejs/plugin-legacy": "^6.0.2",
+    "@vitejs/plugin-vue": "5.2.3"
   },
   "keywords": [
     "capacitor",
