@@ -88,8 +88,7 @@ import {
     IonButtons,
     IonMenuButton,
     IonRouterOutlet,
-    IonItem
-
+    IonItem,onIonViewDidEnter
 } from '@ionic/vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -219,6 +218,12 @@ onMounted(() => {
     }, 8);
 
 });
+
+onIonViewDidEnter(() => {
+    const calendarApi = calendarRef.value.getApi();
+    calendarApi.render();
+});
+
 </script>
 
 <style>

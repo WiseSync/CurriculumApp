@@ -37,10 +37,6 @@
                         <ion-toggle slot="end" :checked="isUserSelectedCode(item.id)" @ionChange="toggleSelection(item.id)"></ion-toggle>
                     </ion-item>
                 </ion-list>
-                <!--
-                <ion-button expand="full" @click="submitSelection">儲存</ion-button>
-                <ion-button expand="full" @click="submitSelection" color="warning">放棄</ion-button>
-                <ion-button expand="full" @click="submitSelection" color="medium">AI推薦</ion-button>-->
             </ion-content>
         </ion-menu>
         <ion-menu-toggle auto-hide="false">
@@ -215,7 +211,7 @@ function filterCodesInEditMenu(event) {
 
 function sortCodes(codes) {
     //User selected > AI selected > not selected, otherwise by id
-    const cs = codes;
+    const cs = [...codes];
     cs.sort((a, b) => {
         if (isUserSelectedCode(b.id) && !isUserSelectedCode(a.id)) return 1;
         if (!isUserSelectedCode(b.id) && isUserSelectedCode(a.id)) return -1;
@@ -292,9 +288,22 @@ async function toggleSelection(id) {
 
 }
 
-function submitSelection() {
-    //console.log('選擇的學習內容編碼：', selectedCodes.value);
-    // 您可以在此處執行提交操作，例如發送到後端
+function getMediaType(url) {
+    if(Utils.isYoutubeUrl(url)){
+        return 'youtube';
+    }else{
+        const ext = url.split('.').pop().toLowerCase();
+        const mimetype = Utils.getMimeTypeFromExtension(ext);
+
+        if(mimetype.includes('video')){
+            return 'video';
+        }else if(mimetype.includes('audio')){
+            return 'audio';
+        }else{
+            console.warn('Unknown media type for URL:', url);
+            return 'unknown';
+        }
+    }
 }
 
 // fetch session_id from route params
@@ -320,14 +329,13 @@ async function fetchSession() {
         metadata.value.endTime = new Date(new Date(data.date + data.duration).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
         metadata.value.deviceId = "YouTube";
 
-        if(Utils.isYoutubeUrl(data.url)){
+        const mediaType = getMediaType(data.url);
+        let player;
+        if(mediaType==='youtube'){
+            // Create a YouTube player
             const vid = getYouTubeId(data.url);
 
-            const player = document.createElement('iframe');
-            player.id = 'video-player';
-            player.style.width = '15%';
-            player.style.marginTop = '0.75em';
-            player.style.marginBottom = '0.75em';
+            player = document.createElement('iframe');
             //player.style.height = '100%';
             //player.style.padding = '0.1em';
             player.src = 'https://www.youtube.com/embed/' + vid;
@@ -335,6 +343,25 @@ async function fetchSession() {
             player.referrerpolicy = 'strict-origin-when-cross-origin';
             player.allowFullscreen = true;
 
+        }else if(mediaType==='video'){
+            // Create a video player
+           player = document.createElement('video');
+            player.controls = true;
+            player.src = AppConfig.ServiceUrl+"/"+data.url;
+        }else if(mediaType==='audio'){
+            // Create an audio player
+            player = document.createElement('audio');
+            player.controls = true;
+            player.src = AppConfig.ServiceUrl+"/"+data.url;
+        }else{
+            console.warn('Unknown media type for URL:', data.url);
+        }
+
+        if(player) {
+            player.id = 'video-player';
+            player.style.width = '15%';
+            player.style.marginTop = '0.75em';
+            player.style.marginBottom = '0.75em';
             playerContainerRef.value.appendChild(player);
         }
 

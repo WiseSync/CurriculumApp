@@ -51,6 +51,7 @@
             </IonList>
         </IonContent>
         <add_video ref="addVideoDialog" @onHide="fetchCourses" />
+        <IonLoading :is-open="showLoading" message="載入中..." />
     </ion-page>
 </template>
 
@@ -59,11 +60,10 @@ import { ref } from 'vue';
 import {
     IonList, IonItem, IonThumbnail, IonImg, IonLabel, IonNote, IonProgressBar, alertController,
     IonIcon, IonFab, IonFabButton, IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton,
-    IonContent
+    IonContent,onIonViewDidEnter,onIonViewWillLeave, IonLoading
 } from '@ionic/vue';
 import { add, trash, refresh } from 'ionicons/icons';  // (importing the icon if needed for IonFabButton)
 import AppConfig from '../app_config';
-import { onMounted, onBeforeUnmount } from 'vue';
 import add_video from '../components/add_video.vue';
 import Utils from '../utils';
 import { useRouter } from 'vue-router';
@@ -73,6 +73,7 @@ const baseApiUrl = AppConfig.ServiceUrl;
 const courses = ref([]);
 const addVideoDialog = ref(null);
 const router = useRouter();
+const showLoading = ref(false);
 
 
 function openAddVideoAlert() {
@@ -188,7 +189,7 @@ function getThumbnailUrl(video) {
             return `https://img.youtube.com/vi/${vid}/default.jpg`;
         }
     } catch (err) {
-        console.warn('Failed to parse YouTube URL.', err);
+        //console.warn('Failed to parse YouTube URL.', err);
     }
 
     // Fallback (invalid or unknown format)
@@ -198,19 +199,25 @@ function getThumbnailUrl(video) {
 async function fetchCourses() {
     const res = await fetch(`${baseApiUrl}/sessions`);
     courses.value = await res.json();
+    showLoading.value = false;
 }
 
 
 
 let pollInterval;
-onMounted(() => {
+
+onIonViewDidEnter(()=>{
     fetchCourses();
     // Poll every 15 seconds:
     pollInterval = setInterval(fetchCourses, 15000);
+    showLoading.value = true;
 });
-onBeforeUnmount(() => {
+
+onIonViewWillLeave(() => {
     if (pollInterval) clearInterval(pollInterval);
+    showLoading.value = false;
 });
+
 </script>
 <style scoped>
 #ion-add-note {

@@ -23,13 +23,23 @@ import { alertController } from '@ionic/vue';
 /* Theme variables */
 //import './theme/variables.css';
 
+let isErrrorDialogOpen = false;
+
 async function showWarningDialog(msg){
-    const alert = await alertController.create({
-        header: '發收未處理錯誤',
-        message: msg,
-        buttons: ["確定"]
-      });
-      await alert.present();
+    if(!isErrrorDialogOpen){
+        const alert = await alertController.create({
+            header: '發收未處理錯誤',
+            message: msg,
+            buttons: ["確定"]
+        });
+        isErrrorDialogOpen = true;
+        await alert.present();
+        alert.onDidDismiss().then(() => {
+            isErrrorDialogOpen = false;
+        });
+    }else{
+        console.warn('Warning dialog is already open. Ignoring new message:', msg);
+    }
 }
 
 const app = createApp(App)

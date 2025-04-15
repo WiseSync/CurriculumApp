@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button menu="commonMenu"></ion-menu-button>
         </ion-buttons>
                 <ion-title slot="start">課程表</ion-title>
                 <!-- <ion-button slot="end">
@@ -26,12 +26,7 @@
 
             </ion-toolbar>
         </ion-header>
-        <ToggleMenu
-      :content-id="contentId"
-      :account-name="accountName"
-      :account-type="accountType"
-      :version="version"
-    ></ToggleMenu>
+        <CommonMenu :content-id="contentId" menu-id="commonMenu"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
         <ion-content :id="contentId">
             <full-calendar ref="calendarRef" :options="calendarOptions"></full-calendar>
@@ -98,7 +93,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import { ref, onMounted } from 'vue';
 import { business,people,hardwareChip,add, eye, closeCircle} from 'ionicons/icons';
 import { menuController } from '@ionic/vue';
-import ToggleMenu from '@/components/menu.vue';
+import CommonMenu from '../components/menu.vue';
 import AppConfig from '../app_config';
 import Utils from '../utils';
 import add_video from '../components/add_video.vue';

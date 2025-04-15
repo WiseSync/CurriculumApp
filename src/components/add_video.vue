@@ -10,113 +10,114 @@
                 </ion-buttons>
             </ion-toolbar>
         </ion-header>
-
         <!-- IonLoading to show while loading orgs/depts -->
-        <IonLoading :is-open="showLoading" message="載入中..." />
-        <ion-item>
-            <ion-label position="stacked">YouTube 網址</ion-label>
-            <ion-input v-model="newVideoUrl" type="url" placeholder="請輸入 YouTube 網址"></ion-input>
-        </ion-item>
-
-        <ion-item>
-            <ion-select label="科目"  label-placement="stacked" v-model="newVideoSubject" interface="popover" placeholder="選擇科目">
-                <ion-select-option value="chinese">國文</ion-select-option>
-                <ion-select-option value="english">英文</ion-select-option>
-                <ion-select-option value="math">數學</ion-select-option>
-                <ion-select-option value="nature">自然 (生物/地科/理化)</ion-select-option>
-                <ion-select-option value="history">歷史</ion-select-option>
-                <ion-select-option value="geography">地理</ion-select-option>
-                <ion-select-option value="civics">公民與社會</ion-select-option>
-            </ion-select>
-        </ion-item>
-        <!-- 同一行: Organization  Department -->
-        <ion-item>
-            <ion-select label="組織/學校"  label-placement="stacked" v-model="selectedOrganizationId" @ionChange="onOrganizationChange($event.detail.value)" interface="popover"  placeholder="選擇組織/學校">
-                <ion-select-option v-for="org in organizations" :key="org.id" :value="org.id">
-                    {{ org.name }}
-                </ion-select-option>
-            </ion-select>
-        </ion-item>
-        <ion-item>
-            <ion-select label="部門/班級"  label-placement="stacked" v-model="selectedDepartmentId" placeholder="選擇部門/班級" interface="popover" >
-                <ion-select-option v-for="dept in departments" :key="dept.id" :value="dept.id">
-                    {{ dept.name }}
-                </ion-select-option>
-            </ion-select>
-        </ion-item>
-        <!-- 上傳時間選擇欄位：使用 IonDatetime 元件 -->
-        <ion-content class="ion-padding">
-            <IonItem>
-                <IonLabel position="stacked">影片時間</IonLabel>
-                <!-- IonDatetime 元件，提供日期與時間選擇器，預設值為當前時間 -->
-                <IonDatetime v-model="videoTime" />
-            </IonItem>
-        </ion-content>
-        <div class="ion-margin-top">
-            <ion-button expand="block" color="primary" @click="submitNewVideo">加入</ion-button>
-        </div>
-        <ion-label color="danger" id="ion-add-note">{{ addErrorMessage }}</ion-label>
+        <ion-segment v-model="uploadMode" style="margin: 1rem;" @ion-change="onSegmentChanged">
+            <ion-segment-button value="youtube" content-id="youtube">
+                <ion-label>YouTube</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="local" content-id="local">
+                <ion-label>本地檔案</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+        <!-- If in YouTube mode, show the original YouTube fields -->
+        <ion-segment-view>
+        <ion-segment-content id="youtube">
+            <ion-item>
+                <ion-label position="stacked">YouTube 網址</ion-label>
+                <ion-input v-model="newVideoUrl" type="url" placeholder="請輸入 YouTube 網址"></ion-input>
+            </ion-item>
+            <add_video_common ref="youtubeCommonRef"/>   
+        </ion-segment-content>
+        <!-- If in Local mode, show local file fields + teacher + localTitle -->
+        <ion-segment-content id="local">
+            <ion-item>
+                <ion-label position="stacked">選擇檔案</ion-label>
+                <input type="file" @change="onFileSelected" style="margin-top: 0.5rem;" accept="audio/*, video/*" />
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">教師名稱</ion-label>
+                <ion-input v-model="localTeacher" placeholder="輸入教師名稱"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">影片/音訊標題</ion-label>
+                <ion-input v-model="localTitle" placeholder="輸入標題"></ion-input>
+            </ion-item>
+        <add_video_common ref="localFileCommonRef"/>    
+        </ion-segment-content>
+    </ion-segment-view>
+    <ion-label color="danger">{{ addErrorMessage }}</ion-label>
+    <div class="ion-margin-top">
+        <ion-button expand="block" color="primary" @click="submit">加入</ion-button>
+    </div>
 
     </IonModal>
 
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import {
-    IonContent,
     IonItem,
     IonLabel,
     IonInput,
-    IonSelect,
-    IonSelectOption,
     IonButton,
     IonModal,
     IonButtons,
     IonHeader,
     IonToolbar,
     IonTitle,
-    IonDatetime,
     IonLoading,
-    IonIcon
+    IonIcon,
+    IonSegment,
+    IonSegmentContent,
+    IonSegmentButton,
+    IonSegmentView
 } from '@ionic/vue';
 import AppConfig from '../app_config';
 import { close } from 'ionicons/icons'; // Import the close icon
 import Utils from '../utils';
+import add_video_common from './add_video_common.vue';
 
 const baseApiUrl = AppConfig.ServiceUrl;
 const emits = defineEmits(['onHide', 'onShow']);
 const showAddModal = ref(false);
 const newVideoUrl = ref("");
-const newVideoSubject = ref("");
+//const newVideoSubject = ref("");
 const addErrorMessage = ref("");
-const videoTime = ref('')      // 儲存選擇的上傳時間（日期與時間）
+const youtubeCommonRef = ref(null); // 取得 add_video_common 的引用
+const localFileCommonRef = ref(null); // 取得 add_video_common 的引用
 
 // New data for org & dept
-const organizations = ref([]);
-const departments = ref([]);
-const selectedOrganizationId = ref(null);
-const selectedDepartmentId = ref(null);
-const showLoading = ref(false);
+//const showLoading = ref(false);
+const uploadMode = ref('youtube'); // 新增的變數，用於選擇上傳模式
+const localTeacher = ref("");
+const localTitle = ref("");
+const selectedFile = ref(null); // 儲存選擇的檔案
 
-function getLocalISOString() {
-    const date = new Date()
-    // 取得與 UTC 的時差（分鐘）再轉為毫秒
-    const tzOffsetInMs = date.getTimezoneOffset() * 60000
-    // 生成「當前時區」對應的時間
-    const localDate = new Date(date.getTime() - tzOffsetInMs)
-    // localDate.toISOString() 仍會是 ISO 字串，但會是已做過偏移校正的「本地時區」時間
-    // 去掉最後的 'Z'，以免 IonDatetime 解讀為 UTC
-    return localDate.toISOString().slice(0, -1)
+
+function onSegmentChanged(event) {
+    if (uploadMode.value === 'youtube') {
+        youtubeCommonRef.value.update(); // 更新 YouTube 的欄位
+    } else if (uploadMode.value === 'local') {
+        localFileCommonRef.value.update(); // 更新 Local File 的欄位
+    }else{
+        addErrorMessage.value = "Invalid upload mode: "+uploadMode.value;
+    }
 }
+
 
 function show() {
     showAddModal.value = true;
     newVideoUrl.value = "";
-    newVideoSubject.value = "";
+    //newVideoSubject.value = "";
     addErrorMessage.value = "";
-    videoTime.value = getLocalISOString(); // 預設為當前時間
-    loadOrganizations();
+    uploadMode.value = 'youtube'; // 預設為 YouTube 模式
+    setTimeout(() => {
+        youtubeCommonRef.value.update(); // 更新 YouTube 的欄位
+    }, 18); // 延遲更新，確保 DOM 已經渲染完成
+    //youtubeCommonRef.value.update(); // 更新 YouTube 的欄位
+    //videoTime.value = getLocalISOString(); // 預設為當前時間
+    //loadOrganizations();
     emits('onShow');
 }
 
@@ -125,67 +126,80 @@ function hide() {
     emits('onHide');
 }
 
-async function loadOrganizations() {
-    showLoading.value = true;
-    try {
-        const resp = await fetch(`${baseApiUrl}/organizations`);
-        if (!resp.ok) {
-            console.error('Failed to load organizations');
-            return;
-        }
-        const data = await resp.json();
-        organizations.value = data; // array of { id, name }
-        if (organizations.value.length > 0) {
-            selectedOrganizationId.value = organizations.value[0].id;
-            await loadDepartments(selectedOrganizationId.value);
-        }
-    } catch (err) {
-        console.error('Error loading organizations:', err);
-    } finally {
-        showLoading.value = false;
+function onFileSelected(evt) {
+  const fileList = evt.target.files;
+  if (fileList && fileList[0]) {
+    selectedFile.value = fileList[0];
+  }
+}
+
+// ...
+
+async function submitLocalFile() {
+  // validations
+  if (!selectedFile.value) {
+    addErrorMessage.value = '請選擇檔案';
+    return;
+  }
+  if (!localTeacher.value) {
+    addErrorMessage.value = '請輸入教師名稱';
+    return;
+  }
+  if (!localTitle.value) {
+    addErrorMessage.value = '請輸入標題';
+    return;
+  }
+  if (!localFileCommonRef.value.newVideoSubject) {
+    addErrorMessage.value = '請選擇科目';
+    return;
+  }
+
+  if (!youtubeCommonRef.value.selectedDepartmentId) {
+    addErrorMessage.value = '請選擇部門';
+    return;
+  }
+  const localTime = new Date(localFileCommonRef.value.videoTime);
+
+  const fd = new FormData();
+  fd.append('department_id', localFileCommonRef.value.selectedDepartmentId);
+  fd.append('subject', localFileCommonRef.value.newVideoSubject);
+  fd.append('teacher', localTeacher.value);
+  fd.append('time', localTime.toISOString());
+  fd.append('title', localTitle.value);
+  fd.append('file', selectedFile.value);
+
+  try {
+    const res = await fetch(`${baseApiUrl}/sessions/uploadlocal`, {
+      method: 'POST',
+      body: fd
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      addErrorMessage.value = text || res.statusText;
+      return;
+    }
+  } catch (error) {
+    console.error('Error uploading local file:', error);
+    addErrorMessage.value = error.message;
+    return;
+  }
+  hide();
+}
+
+
+async function submit(){
+    if(uploadMode.value === 'youtube'){
+        await submitYouTube();
+    }else if(uploadMode.value === 'local'){
+        await submitLocalFile();
+    }else{
+        addErrorMessage.value = "Invalid upload mode: "+uploadMode.value;
     }
 }
 
-async function loadDepartments(orgId) {
-    showLoading.value = true;
-    try {
-        const resp = await fetch(`${baseApiUrl}/organizations/${orgId}/departments`);
-        if (!resp.ok) {
-            console.error('Failed to load departments');
-            return;
-        }
-        const data = await resp.json();
-        departments.value = data; // array of { id, name }
-        if (departments.value.length > 0) {
-            selectedDepartmentId.value = departments.value[0].id;
-        } else {
-            selectedDepartmentId.value = null;
-        }
-    } catch (err) {
-        console.error('Error loading departments:', err);
-    } finally {
-        showLoading.value = false;
-    }
-}
-
-async function onOrganizationChange(value) {
-    selectedOrganizationId.value = value;
-    await loadDepartments(value);
-}
-
-
-async function submitNewVideo() {
+async function submitYouTube() {
     if (newVideoUrl.value) {
         //Check valid YouTube URL
-        const youtubeRegex = new RegExp(
-            '^(https?:\\/\\/)?(www\\.)?(' +
-            // 1) youtube.com/watch? with anything, then v=, then 11 chars, then anything
-            'youtube\\.com\\/watch\\?.*v=[\\w-]{11}.*' +
-            '|' +
-            // 2) short link: youtu.be/ + 11 chars + optional extra
-            'youtu\\.be\\/[\\w-]{11}.*' +
-            ')$'
-        );
         if (!Utils.isYoutubeUrl(newVideoUrl.value)) {
             addErrorMessage.value = "請輸入有效的 YouTube 網址";
             return;
@@ -194,27 +208,23 @@ async function submitNewVideo() {
         addErrorMessage.value = "請輸入有效的 YouTube 網址";
         return;
     }
-
-    if (!newVideoSubject.value) {
+    console.log(youtubeCommonRef.value.newVideoSubject);
+    if (!youtubeCommonRef.value.newVideoSubject) {
         addErrorMessage.value = "請選擇科目";
         return;
     }
 
-    if (!selectedOrganizationId.value) {
-        addErrorMessage.value = '請選擇組織';
-        return;
-    }
-    if (!selectedDepartmentId.value) {
+    if (!youtubeCommonRef.value.selectedDepartmentId) {
         addErrorMessage.value = '請選擇部門';
         return;
     }
 
-    const localTime = new Date(videoTime.value);
+    const localTime = new Date(youtubeCommonRef.value.videoTime);
 
     const requestBody = {
-        department_id: selectedDepartmentId.value,
+        department_id: youtubeCommonRef.value.selectedDepartmentId,
         url: newVideoUrl.value,
-        subject: newVideoSubject.value,
+        subject: youtubeCommonRef.value.newVideoSubject,
         time: localTime.toISOString(), // 使用選擇的上傳時間
     };
     try {

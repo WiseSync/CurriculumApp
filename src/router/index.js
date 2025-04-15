@@ -13,7 +13,7 @@ import List from '../views/list.vue';
 const routes = [
   {
     path: '/',
-    redirect: '/calendar'
+    redirect: '/home'
   },
   {
     path: '/list',

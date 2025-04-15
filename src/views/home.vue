@@ -8,26 +8,12 @@
           <ion-title>首頁</ion-title>
         </ion-toolbar>
       </ion-header>
-    <ToggleMenu
-      :content-id="contentId"
-      :account-name="accountName"
-      :account-type="accountType"
-      :version="version"
-    ></ToggleMenu>
+    <ToggleMenu :contentId="contentId"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
       <ion-content :id="contentId">
         <ion-grid>
           <ion-row>
-            <!-- 装置管理 -->
-            <ion-col size="6">
-              <ion-card @click="openApp('device')">
-                <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.device.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.device.name }}</ion-label>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-            <!-- 课程管理 -->
+            <!-- 課表 -->
             <ion-col size="6">
               <ion-card @click="openApp('course')">
                 <ion-card-content class="app-card">
@@ -36,20 +22,29 @@
                 </ion-card-content>
               </ion-card>
             </ion-col>
+            <!-- 课程笔记 -->
+          <ion-col size="6">
+              <ion-card @click="openApp('list')">
+                <ion-card-content class="app-card">
+                  <ion-icon :icon="apps.list.icon" class="app-icon"></ion-icon>
+                  <ion-label class="app-label">{{ apps.list.name }}</ion-label>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
           </ion-row>
           <ion-row>
-            <!-- 课程笔记 -->
+            <!-- 装置管理 -->
             <ion-col size="6">
-              <ion-card @click="openApp('notes')">
+              <ion-card @click="openApp('device')" disabled="true">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.notes.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.notes.name }}</ion-label>
+                  <ion-icon :icon="apps.device.icon" class="app-icon"></ion-icon>
+                  <ion-label class="app-label">{{ apps.device.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
             <!-- 帐号管理 -->
             <ion-col size="6">
-              <ion-card @click="openApp('account')">
+              <ion-card @click="openApp('account')"  disabled="true">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.account.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.account.name }}</ion-label>
@@ -58,7 +53,7 @@
             </ion-col>
 
             <ion-col size="6">
-              <ion-card @click="openApp('account')">
+              <ion-card @click="openApp('account')" disabled="true">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.classes.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.classes.name }}</ion-label>
@@ -90,14 +85,10 @@
   } from '@ionic/vue';
   import { useRouter } from 'vue-router';
   // 导入图标
-  import { cog, school, book, personCircle, people } from 'ionicons/icons';
+  import { cog, school, book, personCircle, people, list } from 'ionicons/icons';
   import ToggleMenu from '@/components/menu.vue';
 
   const contentId = 'home-content';
-  const accountName = '蘇小鳴';
-  const accountType = '系統管理員';
-  const version = '0.0.1';
-  
   const router = useRouter();
   
   const apps = {
@@ -110,6 +101,11 @@
       name: '课程表',
       icon: school,
       route: '/calendar',
+    },
+    list: {
+      name: '對齊佇列',
+      icon: list,
+      route: '/list',
     },
     notes: {
       name: '課程筆記',
