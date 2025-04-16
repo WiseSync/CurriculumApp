@@ -201,7 +201,9 @@ async function fetchCourses() {
         const res = await fetch(`${baseApiUrl}/sessions`);
         courses.value = await res.json();
     }finally{
-        showLoading.value = false;
+        setTimeout(() => {
+            showLoading.value = false;
+        }, 60);
     }
 }
 
