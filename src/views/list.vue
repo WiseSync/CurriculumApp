@@ -197,9 +197,12 @@ function getThumbnailUrl(video) {
 }
 
 async function fetchCourses() {
-    const res = await fetch(`${baseApiUrl}/sessions`);
-    courses.value = await res.json();
-    showLoading.value = false;
+    try{
+        const res = await fetch(`${baseApiUrl}/sessions`);
+        courses.value = await res.json();
+    }finally{
+        showLoading.value = false;
+    }
 }
 
 
@@ -207,10 +210,10 @@ async function fetchCourses() {
 let pollInterval;
 
 onIonViewDidEnter(()=>{
+    showLoading.value = true;
     fetchCourses();
     // Poll every 15 seconds:
     pollInterval = setInterval(fetchCourses, 15000);
-    showLoading.value = true;
 });
 
 onIonViewWillLeave(() => {

@@ -42,9 +42,9 @@
         <ion-menu-toggle auto-hide="false">
             <ion-button id="open-menu" style="display: none;"></ion-button>
         </ion-menu-toggle>
-        <ion-content :id="contentId" style="display: flex;">
+        <ion-content :id="contentId" >
             <!-- 显示元数据 -->
-            
+            <div  style="display: flex;">
             <ion-card v-if="!showLoading" style="width: 85%;">
                 <ion-card-header>
                     <ion-card-title>{{ metadata.courseName }}</ion-card-title>
@@ -60,7 +60,7 @@
                 </ion-card-content>
             </ion-card>
             <!--<div id="player-container"  style="width: 20%; height: 100%;"/>-->
-            <div style="display: flex;" ref="playerContainerRef">
+            <div  ref="playerContainerRef" style="width: 15%; align-content: center;"></div>
             </div>
             
             <!-- <audio controls :src="'https://file-examples.com/storage/fe2465184067ef97996fb41/2017/11/file_example_MP3_700KB.mp3'" class="classification-audio"></audio>-->
@@ -337,7 +337,6 @@ async function fetchSession() {
             const vid = getYouTubeId(data.url);
 
             player = document.createElement('iframe');
-            //player.style.height = '100%';
             //player.style.padding = '0.1em';
             player.src = 'https://www.youtube.com/embed/' + vid;
             player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
@@ -360,7 +359,8 @@ async function fetchSession() {
 
         if(player) {
             player.id = 'video-player';
-            player.style.width = '15%';
+            player.style.height = '90%';
+            player.style.width = '100%';
             player.style.marginTop = '0.75em';
             player.style.marginBottom = '0.75em';
             playerContainerRef.value.appendChild(player);
