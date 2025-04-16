@@ -1,10 +1,10 @@
 'use strict'
 
-const PORT = 8080;
+const BasePORT = 8080;
 const url = new URL(window.location.href);
 let BaseUrl = '';
 if (url.hostname === 'localhost') {
-    BaseUrl = `http://localhost:${PORT}`;
+    BaseUrl = `http://localhost:${BasePORT}`;
 } else {
     BaseUrl = `${url.protocol}//${url.hostname}:${BasePort}`;
 }
