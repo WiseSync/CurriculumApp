@@ -35,12 +35,12 @@
                 <input type="file" @change="onFileSelected" style="margin-top: 0.5rem;" accept="audio/*, video/*" />
             </ion-item>
             <ion-item>
-                <ion-label position="stacked">教師名稱</ion-label>
-                <ion-input v-model="localTeacher" placeholder="輸入教師名稱"></ion-input>
-            </ion-item>
-            <ion-item>
                 <ion-label position="stacked">影片/音訊標題</ion-label>
                 <ion-input v-model="localTitle" placeholder="輸入標題"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label position="stacked">教師名稱</ion-label>
+                <ion-input v-model="localTeacher" placeholder="輸入教師名稱"></ion-input>
             </ion-item>
         <add_video_common ref="localFileCommonRef"/>    
         </ion-segment-content>
