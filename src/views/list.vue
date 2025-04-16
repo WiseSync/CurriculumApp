@@ -148,7 +148,7 @@ async function resumeVideo(videoId) {
 async function onVideoClick(video) {
     if (video.status === 'done') {
         // Navigate to detail page for this video
-        router.push({ name: 'Alignment', params: { sessionId: video.id } });
+        router.push({ name: 'Note', params: { sessionId: video.id, type:"alignment" } });
     } else if (video.status === 'error') {
         // Resume processing this video
         await fetch(`${baseApiUrl}/sessions/${video.id}/resume`, { method: 'POST' });

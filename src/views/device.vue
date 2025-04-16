@@ -6,26 +6,19 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
           <ion-title slot="start">裝置管理</ion-title>
-          <ion-select label-placement="stacked" label="學校" value="all" slot="end" class="DeviceCommonSelectOption">
+          <ion-select label-placement="stacked" label="學校" value="near" slot="end" class="DeviceCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="all">全部</ion-select-option>
-                    <ion-select-option value="school001">師大附中</ion-select-option>
-                    <ion-select-option value="school002">永平高中</ion-select-option>
+                    <ion-select-option value="near">國家教育研究院</ion-select-option>
                 </ion-select>
-                <ion-select label-placement="stacked" label="狀態" value="all" slot="end" class="DeviceCommonSelectOption DeviceStatsOption">
+                <ion-select label-placement="stacked" label="狀態" v-model="selectedStatus" slot="end" class="DeviceCommonSelectOption DeviceStatsOption">
                     <ion-icon slot="start" :icon="statsChart" aria-hidden="true"></ion-icon>
                     <ion-select-option value="all">全部</ion-select-option>
-                    <ion-select-option value="device001">離線中</ion-select-option>
-                    <ion-select-option value="device001">待機中</ion-select-option>
+                    <ion-select-option value="offline">離線中</ion-select-option>
+                    <ion-select-option value="idle">待機中</ion-select-option>
                 </ion-select>
         </ion-toolbar>
       </ion-header>
-      <ToggleMenu
-      :content-id="contentId"
-      :account-name="accountName"
-      :account-type="accountType"
-      :version="version"
-    ></ToggleMenu>
+      <ToggleMenu :content-id="contentId"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
       <ion-content>
         <ion-grid>
@@ -33,7 +26,7 @@
             <ion-col
               size="6"
               size-md="2"
-              v-for="device in devices"
+              v-for="device in filterDevices()"
               :key="device.id"
             >
               <ion-card @click="goToDeviceDetail(device)">
@@ -83,191 +76,60 @@
     IonRouterOutlet
   } from '@ionic/vue';
   import { hardwareChip } from 'ionicons/icons';
-  import { business,statsChart, menu} from 'ionicons/icons';
+  import { business,statsChart} from 'ionicons/icons';
   import ToggleMenu from '@/components/menu.vue';
   
   const contentId = ref('menu-content');
-    const accountName = ref('蘇小鳴');
-    const accountType = ref('教師');
-    const version = ref('0.0.1');
+  const selectedStatus = ref('all');
   
   const devices = ref([
     {
       id: 1,
       icon: hardwareChip,
-      name: 'hsntnu-0103',
-      school: '師大附中',
-      class: '一年三班',
-      status: '待機中',
+      name: 'naer-001',
+      school: '國家教育研究院',
+      class: '測評中心',
+      status: 'offline',
     },
     {
       id: 2,
       icon: hardwareChip,
-      name: 'hsntnu-0104',
-      school: '師大附中',
-      class: '一年四班',
-      status: '錄音中',
+      name: 'naer-002',
+      school: '國家教育研究院',
+      class: '測評中心',
+      status: 'offline',
     },
     {
       id: 3,
       icon: hardwareChip,
-      name: 'hsntnu-0105',
-      school: '師大附中',
-      class: '一年五班',
-      status: '離線中',
-    },
-    {
-      id: 4,
-      icon: hardwareChip,
-      name: 'hsntnu-0106',
-      school: '師大附中',
-      class: '一年六班',
-      status: '故障中',
-    },
-    {
-      id: 5,
-      icon: hardwareChip,
-      name: 'hsntnu-0107',
-      school: '師大附中',
-      class: '一年七班',
-      status: '待機中',
-    },
-    {
-      id: 6,
-      icon: hardwareChip,
-      name: 'hsntnu-0108',
-      school: '師大附中',
-      class: '一年八班',
-      status: '待機中',
-    },
-    {
-      id: 7,
-      icon: hardwareChip,
-      name: 'hsntnu-0201',
-      school: '師大附中',
-      class: '二年一班',
-      status: '待機中',
-    },
-    {
-      id: 8,
-      icon: hardwareChip,
-      name: 'hsntnu-0202',
-      school: '師大附中',
-      class: '二年二班',
-      status: '待機中',
-    },
-    {
-      id: 9,
-      icon: hardwareChip,
-      name: 'hsntnu-0301',
-      school: '師大附中',
-      class: '三年一班',
-      status: '待機中',
-    },
-    {
-      id: 10,
-      icon: hardwareChip,
-      name: 'hsntnu-0302',
-      school: '師大附中',
-      class: '三年二班',
-      status: '待機中',
-    },
-    {
-      id: 1,
-      icon: hardwareChip,
-      name: 'yphs-0101',
-      school: '永平高中',
-      class: '一年一班',
-      status: '待機中',
-    },
-    {
-      id: 2,
-      icon: hardwareChip,
-      name: 'yphs-0102',
-      school: '永平高中',
-      class: '一年二班',
-      status: '錄音中',
-    },
-    {
-      id: 3,
-      icon: hardwareChip,
-      name: 'yphs-0103',
-      school: '永平高中',
-      class: '一年三班',
-      status: '離線中',
-    },
-    {
-      id: 4,
-      icon: hardwareChip,
-      name: 'yphs-0104',
-      school: '永平高中',
-      class: '一年四班',
-      status: '故障中',
-    },
-    {
-      id: 5,
-      icon: hardwareChip,
-      name: 'yphs-0105',
-      school: '永平高中',
-      class: '一年五班',
-      status: '待機中',
-    },
-    {
-      id: 6,
-      icon: hardwareChip,
-      name: 'yphs-0106',
-      school: '永平高中',
-      class: '一年六班',
-      status: '待機中',
-    },
-    {
-      id: 7,
-      icon: hardwareChip,
-      name: 'yphs-0107',
-      school: '永平高中',
-      class: '一年七班',
-      status: '待機中',
-    },
-    {
-      id: 8,
-      icon: hardwareChip,
-      name: 'yphs-0108',
-      school: '永平高中',
-      class: '一年八班',
-      status: '待機中',
-    },
-    {
-      id: 9,
-      icon: hardwareChip,
-      name: 'yphs-0109',
-      school: '永平高中',
-      class: '一年九班',
-      status: '待機中',
-    },
-    {
-      id: 10,
-      icon: hardwareChip,
-      name: 'yphs-0201',
-      school: '永平高中',
-      class: '二年一班',
-      status: '待機中',
-    },
-    // 可以添加更多裝置
+      name: 'naer-003',
+      school: '國家教育研究院',
+      class: '測評中心',
+      status: 'offline',
+    }
   ]);
   
   function getStatusColor(status) {
     switch (status) {
-      case '待機中':
+      case 'idle':
         return 'medium';
-      case '錄音中':
+      case 'recording':
         return 'success';
-      case '離線中':
+      case 'offline':
         return 'warning';
-      case '故障中':
+      case 'malfunction':
         return 'danger';
       default:
         return 'medium';
     }
+  }
+
+  function filterDevices() {
+    // 根據選擇的狀態過濾裝置
+    if (selectedStatus.value === 'all') {
+      return devices.value;
+    }
+    return devices.value.filter(device => device.status === selectedStatus.value);
   }
   
   function goToDeviceDetail(device) {
@@ -279,7 +141,6 @@
   <style scoped>
   ion-card {
     --ion-card-background: var(--ion-color-light);
-    cursor: pointer;
   }
   
   ion-avatar {
@@ -310,11 +171,11 @@
     text-align: center;
   }
 
-  .DeviceCommonSelectOption {
+.DeviceCommonSelectOption {
     margin-left: 5rem;
-    width: 7.25rem;
+    width: 10.5rem;
 }
 .DeviceStatsOption {
     width: 6.25rem;
 }
-  </style>
+</style>

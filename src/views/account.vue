@@ -14,11 +14,7 @@
           <ion-searchbar v-model="searchQuery" placeholder="搜索姓名或ID" slot="start"></ion-searchbar>
         </ion-toolbar>
       </ion-header>
-      <ToggleMenu
-      :content-id="contentId"
-      :account-name="accountName"
-      :account-type="accountType"
-      :version="version"
+      <ToggleMenu :content-id="contentId"
     ></ToggleMenu>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
       <ion-content :id="contentId">
@@ -77,7 +73,6 @@
   } from '@ionic/vue';
   import { ref, computed, onMounted } from 'vue';
   import {
-    add as addIcon,
     create as createIcon,
     trash as trashIcon,
   } from 'ionicons/icons';

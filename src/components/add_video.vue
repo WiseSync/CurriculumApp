@@ -2,7 +2,7 @@
     <IonModal :isOpen="showAddModal" @didDismiss="hide">
         <ion-header>
             <ion-toolbar>
-                <ion-title>加入 YouTube 影片</ion-title>
+                <ion-title>加入課程</ion-title>
                 <ion-buttons slot="end">
                     <ion-button @click="hide">
                         <ion-icon slot="icon-only" :icon="close"></ion-icon>

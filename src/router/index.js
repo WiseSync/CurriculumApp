@@ -1,11 +1,9 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import Meeting from '../views/calendar.vue';
 import Device from '../views/device.vue';
-import Alignment from '../views/alignment.vue';
 import Note from '../views/note.vue';
 import Home from '../views/home.vue';
 import Login from '../views/login.vue';
-import CalendarNote from '../views/calendar_note.vue';
 import Schools from '../views/schools.vue';
 import account from '../views/account.vue';
 import List from '../views/list.vue';
@@ -21,7 +19,7 @@ const routes = [
     component: List
   },
   {
-    path: '/calendar',
+    path: '/calendar/:type',
     name: 'Calendar',
     component: Meeting
   },
@@ -31,13 +29,7 @@ const routes = [
     component: Device
   },
     {
-        path: '/alignment/:sessionId(\\d+)',
-        name: 'Alignment',
-        component: Alignment
-    }
-    ,
-    {
-        path: '/note/:sessionId(\\d+)',
+        path: '/note/:sessionId(\\d+)/:type',
         name: 'Note',
         component: Note
     },
@@ -50,11 +42,6 @@ const routes = [
         path: '/login',
         name: 'Login',
         component: Login
-    },
-    {
-        path: '/calendar_note',
-        name: 'CalendarNote',
-        component: CalendarNote
     },
     {
         path: '/schools',

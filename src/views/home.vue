@@ -15,7 +15,7 @@
           <ion-row>
             <!-- 課表 -->
             <ion-col size="6">
-              <ion-card @click="openApp('course')">
+              <ion-card @click="openApp(apps.course.route, {type: 'alignment'})">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.course.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.course.name }}</ion-label>
@@ -23,37 +23,38 @@
               </ion-card>
             </ion-col>
             <!-- 课程笔记 -->
-          <ion-col size="6">
-              <ion-card @click="openApp('list')">
+            <ion-col size="6">
+              <ion-card @click="openApp(apps.notes.route, {type: 'notes'})">
+                <ion-card-content class="app-card">
+                  <ion-icon :icon="apps.notes.icon" class="app-icon"></ion-icon>
+                  <ion-label class="app-label">{{ apps.notes.name }}</ion-label>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6">
+              <ion-card @click="openApp(apps.list.route)">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.list.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.list.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
-          </ion-row>
-          <ion-row>
             <!-- 装置管理 -->
             <ion-col size="6">
-              <ion-card @click="openApp('device')" disabled="true">
+              <ion-card @click="openApp(apps.device.route)">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.device.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.device.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
-            <!-- 帐号管理 -->
+          </ion-row>
+          <ion-row>
+            <!--  Class Management -->
             <ion-col size="6">
-              <ion-card @click="openApp('account')"  disabled="true">
-                <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.account.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.account.name }}</ion-label>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-
-            <ion-col size="6">
-              <ion-card @click="openApp('account')" disabled="true">
+              <ion-card @click="openApp(apps.classes.route)" disabled="true">
                 <ion-card-content class="app-card">
                   <ion-icon :icon="apps.classes.icon" class="app-icon"></ion-icon>
                   <ion-label class="app-label">{{ apps.classes.name }}</ion-label>
@@ -95,40 +96,37 @@
     device: {
       name: '装置管理',
       icon: cog,
-      route: '/device',
+      route: 'Device',
     },
     course: {
       name: '课程表',
       icon: school,
-      route: '/calendar',
+      route: 'Calendar',
     },
     list: {
-      name: '對齊佇列',
+      name: '對齊進度',
       icon: list,
-      route: '/list',
+      route: 'List',
     },
     notes: {
       name: '課程筆記',
       icon: book,
-      route: '/calendar',
+      route: 'Calendar',
     },
     account: {
       name: '帳號管理',
       icon: personCircle,
-      route: '/account',
+      route: 'Account',
     },
     classes: {
       name: '班級管理',
       icon: people,
-      route: '/class',
+      route: 'Class',
     },
   };
   
-  function openApp(appKey) {
-    const app = apps[appKey];
-    if (app && app.route) {
-      router.push(app.route);
-    }
+  function openApp(appKey, props={}) {
+    router.push({name: appKey, params:props});
   }
   </script>
   <style scoped>
@@ -138,6 +136,11 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+  }
+
+  .app-card:hover {
+    background-color: var(--ion-color-light);
+    cursor: pointer;
   }
   
   .app-icon {

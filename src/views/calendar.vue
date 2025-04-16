@@ -56,7 +56,7 @@
       <ion-menu-toggle auto-hide="false">
         <ion-button id="open-menu" style="display: none;"></ion-button>
       </ion-menu-toggle>
-            <ion-fab  slot="fixed" vertical="bottom" horizontal="end">
+            <ion-fab v-if="isAlignmentMode"  slot="fixed" vertical="bottom" horizontal="end">
                 <ion-fab-button @click="addVideoDialog.show()">
                 <ion-icon :icon="add"></ion-icon>
                 </ion-fab-button>
@@ -98,15 +98,15 @@ import AppConfig from '../app_config';
 import Utils from '../utils';
 import add_video from '../components/add_video.vue';
 import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 const calendarRef = ref(null);
 const selectedCourse = ref(null);
 const contentId = 'main-content';
-const accountName = '王小明';
-const accountType = '教師';
-const version = '0.0.1';
 const addVideoDialog = ref(null);
 const router = useRouter();
+const route = useRoute();
+const isAlignmentMode = ref(route.params.type === 'alignment');
 
 
 
@@ -183,9 +183,10 @@ function formatDate(date) {
 
 function enterCourse() {
     router.push({
-        name: 'Alignment',
+        name: 'Note',
         params: {
             sessionId: selectedCourse.value.id,
+            type: route.params.type
         }
     });
 }
@@ -206,7 +207,7 @@ onMounted(() => {
 <style>
 .CalendarCommonSelectOption {
     margin-left: 5rem;
-    width: 7.25rem;
+    width: 10.5rem;
 }
 .CalendarDeviceOption {
     width: 9rem;
