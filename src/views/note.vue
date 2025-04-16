@@ -327,7 +327,7 @@ async function fetchSession() {
         metadata.value.teacher = data.teacher;
         metadata.value.subject = data.subject;
         metadata.value.startTime = new Date(new Date(data.date).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
-        metadata.value.endTime = new Date(new Date(data.date + data.duration).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
+        metadata.value.endTime = new Date(new Date(new Date(data.date).getTime() + data.duration).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
         metadata.value.deviceId = "YouTube";
 
         const mediaType = getMediaType(data.url);
@@ -526,7 +526,7 @@ onMounted(async () => {
 
         setTimeout(() => {
             showLoading.value = false;
-        }, 18);
+        }, 60);
     } catch (error) {
         setTimeout(() => {
             showLoading.value = false;
@@ -537,7 +537,7 @@ onMounted(async () => {
             }).then(alert => {
                 alert.present();
             });
-        }, 18);
+        }, 60);
         
     }
    
