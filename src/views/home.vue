@@ -104,7 +104,7 @@
       route: 'Calendar',
     },
     list: {
-      name: '對齊進度',
+      name: '工作佇列',
       icon: list,
       route: 'List',
     },

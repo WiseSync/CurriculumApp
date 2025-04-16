@@ -42,9 +42,9 @@
         <ion-menu-toggle auto-hide="false">
             <ion-button id="open-menu" style="display: none;"></ion-button>
         </ion-menu-toggle>
-        <ion-content :id="contentId">
+        <ion-content :id="contentId" style="display: flex;">
             <!-- 显示元数据 -->
-             <div style="display: flex;" ref="playerContainerRef">
+            
             <ion-card v-if="!showLoading" style="width: 85%;">
                 <ion-card-header>
                     <ion-card-title>{{ metadata.courseName }}</ion-card-title>
@@ -60,6 +60,7 @@
                 </ion-card-content>
             </ion-card>
             <!--<div id="player-container"  style="width: 20%; height: 100%;"/>-->
+            <div style="display: flex;" ref="playerContainerRef">
             </div>
             
             <!-- <audio controls :src="'https://file-examples.com/storage/fe2465184067ef97996fb41/2017/11/file_example_MP3_700KB.mp3'" class="classification-audio"></audio>-->
