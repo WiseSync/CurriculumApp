@@ -3,13 +3,12 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button></ion-menu-button>
+                    <ion-menu-button menu="listCommonMenu"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課程列表</ion-title>
             </ion-toolbar>
         </ion-header>
-        <CommonMenu content-id="ListContent">
-        </CommonMenu>
+        <CommonMenu content-id="ListContent" menu-id="listCommonMenu" />
         <IonFab slot="fixed" vertical="bottom" horizontal="end">
             <IonFabButton @click="openAddVideoAlert">
                 <IonIcon :icon="add" /> <!-- displays a "+" icon -->
