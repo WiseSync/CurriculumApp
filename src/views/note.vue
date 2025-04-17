@@ -15,7 +15,7 @@
         </CommonMenu>
         <!-- <ion-router-outlet :id="contentId"></ion-router-outlet>-->
 
-        <ion-menu side="end" :content-id="contentId" menu-id="codesMenu" type="overlay" style="--width:35%">
+        <ion-menu side="end" :content-id="contentId" :menu-id="codesMenuId" type="overlay" style="--width:35%">
             <ion-header>
                 <ion-searchbar placeholder="編碼或定義" slot="start" @ionInput="filterCodesInEditMenu($event)"></ion-searchbar>
             </ion-header>
@@ -149,7 +149,7 @@ import {
     IonLoading,
     alertController,
     IonIcon,
-    IonModal, onIonViewDidLeave
+    IonModal, onIonViewDidLeave, onIonViewDidEnter
 } from '@ionic/vue';
 import { menuController } from '@ionic/vue';
 import CommonMenu from '@/components/menu.vue';
@@ -184,6 +184,8 @@ const playerContainerRef = ref(null);
 const showAlignment = ref(route.params.type === 'alignment');
 const showChatModal = ref(false);
 const commonMenuId = ref('noteCommonMenu-'+route.params.sessionId+'-'+route.params.typ);
+const codesMenuId = ref('codesMenu'+route.params.sessionId+'-'+route.params.type);
+const mediaPlayerId = ref('mediaPlayer'+route.params.sessionId+'-'+route.params.type);
 
 // Callback for IonModal "willDismiss" event
 function onChatModalWillDismiss() {
@@ -228,7 +230,7 @@ function openCodesMenu(segment,codesType) {
     selectedCodesType.value = codesType;    
     selectedSegment.value = segment;
     selectedCodes.value = sortCodes(learningCodes[codesType]);
-    menuController.open("codesMenu");
+    menuController.open(codesMenuId.value);
 }
 
 function aiReason(codeId) {
@@ -326,10 +328,13 @@ async function fetchSession() {
         metadata.value.subject = data.subject;
         metadata.value.startTime = new Date(new Date(data.date).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
         metadata.value.endTime = new Date(new Date(new Date(data.date).getTime() + data.duration).getTime() - tzOffsetInMs).toLocaleString("zh-TW");
-        metadata.value.deviceId = "YouTube";
+        metadata.value.deviceId = Utils.isYoutubeUrl(data.url) ? "YouTube" : "雲端檔案";
 
         const mediaType = getMediaType(data.url);
-        let player;
+        let player = document.getElementById(mediaPlayerId.value);
+        if(player){
+            player.remove();
+        }
         if(mediaType==='youtube'){
             // Create a YouTube player
             const vid = getYouTubeId(data.url);
@@ -356,7 +361,7 @@ async function fetchSession() {
         }
 
         if(player) {
-            player.id = 'video-player';
+            player.id = mediaPlayerId.value;
             player.style.height = '90%';
             player.style.width = '100%';
             player.style.marginTop = '0.75em';
@@ -507,7 +512,7 @@ async function fetchLearningPerformances(subject) {
 }
 
 
-onMounted(async () => {
+onIonViewDidEnter(async () => {
     try{
         await fetchSegments();
         await fetchSession();
@@ -543,6 +548,11 @@ onMounted(async () => {
 
 onIonViewDidLeave(() => {
     menuController.close(commonMenuId.value);
+    menuController.close(codesMenuId.value);
+    const player = document.getElementById(mediaPlayerId.value);
+    if (player) {
+        player.remove();
+    }
 });
 
 
