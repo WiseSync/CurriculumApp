@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button></ion-menu-button>
+                    <ion-menu-button  :menu="commonMenuId"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課綱對齊</ion-title>
                 <ion-button slot="end"  @click="openChat">
@@ -11,7 +11,7 @@
                 </ion-button>
             </ion-toolbar>
         </ion-header>
-        <CommonMenu :content-id="contentId" :account-name="accountName" :account-type="accountType" :version="version">
+        <CommonMenu :content-id="contentId" :menu-id="commonMenuId">
         </CommonMenu>
         <!-- <ion-router-outlet :id="contentId"></ion-router-outlet>-->
 
@@ -149,7 +149,7 @@ import {
     IonLoading,
     alertController,
     IonIcon,
-    IonModal
+    IonModal, onIonViewDidLeave
 } from '@ionic/vue';
 import { menuController } from '@ionic/vue';
 import CommonMenu from '@/components/menu.vue';
@@ -161,9 +161,6 @@ import Utils from '../utils';
 import ChatBox from '@/components/ChatBox.vue'; // The second view described below
 import unknownImgUrl from "../../assets/images/unknown.jpeg?url";
 
-const accountName = '蘇小鳴';
-const accountType = '教師';
-const version = '1.0.0';
 const segments = ref([]);
 const showLoading = ref(true);
 const router = useRouter();
@@ -186,6 +183,7 @@ const learningCodes = {};
 const playerContainerRef = ref(null);
 const showAlignment = ref(route.params.type === 'alignment');
 const showChatModal = ref(false);
+const commonMenuId = ref('noteCommonMenu-'+route.params.sessionId+'-'+route.params.typ);
 
 // Callback for IonModal "willDismiss" event
 function onChatModalWillDismiss() {
@@ -541,6 +539,10 @@ onMounted(async () => {
         
     }
    
+});
+
+onIonViewDidLeave(() => {
+    menuController.close(commonMenuId.value);
 });
 
 
