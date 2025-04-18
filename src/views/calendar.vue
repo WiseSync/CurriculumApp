@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-          <ion-menu-button menu="commonMenu"></ion-menu-button>
+          <ion-menu-button :menu="commonMenuId"></ion-menu-button>
         </ion-buttons>
                 <ion-title slot="start">課程表</ion-title>
                 <!-- <ion-button slot="end">
@@ -26,7 +26,7 @@
 
             </ion-toolbar>
         </ion-header>
-        <CommonMenu :content-id="contentId" menu-id="commonMenu"/>
+        <CommonMenu :content-id="contentId" :menu-id="commonMenuId"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
         <ion-content :id="contentId">
             <full-calendar ref="calendarRef" :options="calendarOptions"></full-calendar>
@@ -107,6 +107,7 @@ const addVideoDialog = ref(null);
 const router = useRouter();
 const route = useRoute();
 const isAlignmentMode = ref(route.params.type === 'alignment');
+const commonMenuId = ref('calendarCommonMenu-'+route.params.type);
 
 
 
