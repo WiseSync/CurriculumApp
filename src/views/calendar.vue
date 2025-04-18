@@ -31,7 +31,7 @@
         <ion-content :id="contentId">
             <full-calendar ref="calendarRef" :options="calendarOptions"></full-calendar>
             <!-- 侧边菜单 -->
-      <ion-menu side="end" :content-id="contentId" type="overlay" menu-id="courseMenu">
+      <ion-menu side="end" :content-id="contentId" type="overlay" :menu-id="courseMenuId">
         <ion-header>
           <ion-toolbar>
             <ion-title>課程詳情</ion-title>
@@ -108,6 +108,7 @@ const router = useRouter();
 const route = useRoute();
 const isAlignmentMode = ref(route.params.type === 'alignment');
 const commonMenuId = ref('calendarCommonMenu-'+route.params.type);
+const courseMenuId = ref('courseMenu-'+route.params.type);
 
 
 
@@ -174,7 +175,7 @@ async function handleEventClick(info) {
   selectedCourse.value = info.event;
 
   // 打开右侧菜单
-  await menuController.open('courseMenu');
+  await menuController.open(courseMenuId.value);
 }
 
 function formatDate(date) {

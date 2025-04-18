@@ -51,8 +51,9 @@
               </ion-card>
             </ion-col>
           </ion-row>
+          <!--
           <ion-row>
-            <!--  Class Management -->
+
             <ion-col size="6">
               <ion-card @click="openApp(apps.classes.route)" disabled="true">
                 <ion-card-content class="app-card">
@@ -62,6 +63,7 @@
               </ion-card>
             </ion-col>
           </ion-row>
+        -->
         </ion-grid>
       </ion-content>
     </ion-page>
