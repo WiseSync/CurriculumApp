@@ -5,7 +5,7 @@
                 <ion-buttons slot="start">
           <ion-menu-button :menu="commonMenuId"></ion-menu-button>
         </ion-buttons>
-                <ion-title slot="start">課程表</ion-title>
+                <ion-title slot="start">{{ pageTitle }}</ion-title>
                 <!-- <ion-button slot="end">
                     <ion-icon :icon="add"></ion-icon>
                 </ion-button> -->
@@ -21,7 +21,7 @@
 
                 <ion-select label-placement="stacked" label="裝置" value="device001" slot="end" class="CalendarCommonSelectOption CalendarDeviceOption">
                     <ion-icon slot="start" :icon="hardwareChip" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="device001">YouTube</ion-select-option>
+                    <ion-select-option value="device001">所有</ion-select-option>
                 </ion-select>
 
             </ion-toolbar>
@@ -109,6 +109,13 @@ const route = useRoute();
 const isAlignmentMode = ref(route.params.type === 'alignment');
 const commonMenuId = ref('calendarCommonMenu-'+route.params.type);
 const courseMenuId = ref('courseMenu-'+route.params.type);
+const pageTitle = ref('課程表');
+
+if (isAlignmentMode.value) {
+    pageTitle.value = '對程表';
+} else {
+    pageTitle.value = '課程筆記';
+}
 
 
 

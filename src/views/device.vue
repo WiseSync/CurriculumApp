@@ -5,7 +5,7 @@
             <ion-buttons slot="start">
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
-          <ion-title slot="start">裝置管理</ion-title>
+          <ion-title slot="start">設備監控</ion-title>
           <ion-select label-placement="stacked" label="學校" value="near" slot="end" class="DeviceCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
                     <ion-select-option value="near">國家教育研究院</ion-select-option>

@@ -96,7 +96,7 @@
   
   const apps = {
     device: {
-      name: '装置管理',
+      name: '設備監控',
       icon: cog,
       route: 'Device',
     },

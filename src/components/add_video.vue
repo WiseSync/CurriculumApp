@@ -47,8 +47,9 @@
     </ion-segment-view>
     <ion-label color="danger">{{ addErrorMessage }}</ion-label>
     <div class="ion-margin-top">
-        <ion-button expand="block" color="primary" @click="submit">加入</ion-button>
+        <ion-button expand="block" color="primary" :disabled="showUploading" @click="submit">加入</ion-button>
     </div>
+    <ion-loading :isOpen="showUploading" message="上傳中..." />
 
     </IonModal>
 
@@ -86,6 +87,7 @@ const newVideoUrl = ref("");
 const addErrorMessage = ref("");
 const youtubeCommonRef = ref(null); // 取得 add_video_common 的引用
 const localFileCommonRef = ref(null); // 取得 add_video_common 的引用
+const showUploading = ref(false); // 上傳中的 loading
 
 // New data for org & dept
 //const showLoading = ref(false);
@@ -169,6 +171,7 @@ async function submitLocalFile() {
   fd.append('file', selectedFile.value);
 
   try {
+    showUploading.value = true; // Show loading
     const res = await fetch(`${baseApiUrl}/sessions/uploadlocal`, {
       method: 'POST',
       body: fd
@@ -183,6 +186,7 @@ async function submitLocalFile() {
     addErrorMessage.value = error.message;
     return;
   }
+  showUploading.value = false; // Hide loading
   hide();
 }
 
@@ -228,6 +232,7 @@ async function submitYouTube() {
         time: localTime.toISOString(), // 使用選擇的上傳時間
     };
     try {
+        showUploading.value = true; // Show loading
         const res = await fetch(`${baseApiUrl}/sessions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -244,6 +249,7 @@ async function submitYouTube() {
         addErrorMessage.value = error.message;
         return;
     }
+    showUploading.value = false; // Hide loading
     // close modal
     hide();
 }
