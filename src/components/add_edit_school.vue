@@ -118,7 +118,7 @@ ion-item {
 }
 
 ion-label {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: bold;
   color: #333;
 }
@@ -126,7 +126,7 @@ ion-label {
 ion-input,
 ion-select,
 ion-textarea {
-  font-size: 14px;
+  font-size: 0.875rem;
   --padding-start: 0;
 }
 

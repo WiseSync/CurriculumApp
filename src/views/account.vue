@@ -227,14 +227,14 @@
   }
   
   ion-label h2 {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: bold;
     color: #333;
     margin-bottom: 4px;
   }
   
   ion-label p {
-    font-size: 14px;
+    font-size: 0.875rem;
     color: #666;
     margin-bottom: 2px;
   }

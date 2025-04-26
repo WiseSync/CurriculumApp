@@ -6,12 +6,13 @@
                     <ion-menu-button menu="listCommonMenu"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課程列表</ion-title>
+                <h1 style="visibility:hidden;display: none;">課程列表</h1>
             </ion-toolbar>
         </ion-header>
         <CommonMenu content-id="ListContent" menu-id="listCommonMenu" />
         <IonFab slot="fixed" vertical="bottom" horizontal="end">
             <IonFabButton @click="openAddVideoAlert">
-                <IonIcon :icon="add" /> <!-- displays a "+" icon -->
+                <IonIcon :icon="add" alt="加入的圖示" aria-label="加入的圖示"/> <!-- displays a "+" icon -->
             </IonFabButton>
         </IonFab>
         <IonContent id="ListContent">
@@ -20,7 +21,7 @@
                 <IonItem v-for="video in courses" :key="video.id" button="true" @click="onVideoClick(video)">
                     <!-- YouTube Thumbnail -->
                     <IonThumbnail slot="start">
-                        <IonImg :src="getThumbnailUrl(video)" alt="Thumbnail" />
+                        <IonImg :src="getThumbnailUrl(video)" :alt="video.title+的縮圖" :aria-label="video.title+的縮圖" />
                     </IonThumbnail>
 
                     <!-- Title and status info -->
@@ -43,9 +44,9 @@
                     </IonLabel>
 
                     <!-- Delete icon (trash can) -->
-                    <IonIcon slot="end" :icon="refresh" v-if="video.status === 'error'"
+                    <IonIcon slot="end" :icon="refresh" v-if="video.status === 'error'" alt="更新的圖示" aria-label="更新的圖示"
                         @click.stop="resumeVideo(video.id)" />
-                    <IonIcon slot="end" :icon="trash" @click.stop="deleteVideo(video)" />
+                    <IonIcon slot="end" :icon="trash" @click.stop="deleteVideo(video)"  alt="刪除的圖示" aria-label="刪除的圖示"/>
                 </IonItem>
             </IonList>
         </IonContent>

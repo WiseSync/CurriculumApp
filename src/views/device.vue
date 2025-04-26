@@ -6,6 +6,7 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
           <ion-title slot="start">設備監控</ion-title>
+          <h1 style="visibility:hidden;display: none;">設備監控</h1>
           <ion-select label-placement="stacked" label="學校" value="near" slot="end" class="DeviceCommonSelectOption">
                     <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
                     <ion-select-option value="near">國家教育研究院</ion-select-option>

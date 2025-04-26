@@ -6,7 +6,7 @@
           <ion-title>AI小助手</ion-title>
           <ion-buttons slot="end">
             <ion-button @click="closeModal">
-                <ion-icon :icon="close" slot="icon-only"></ion-icon>
+                <ion-icon :icon="close" slot="icon-only"  alt="關閉的圖示" aria-label="關閉的圖示"></ion-icon>
             </ion-button>
           </ion-buttons>
         </ion-toolbar>
@@ -244,7 +244,7 @@
     max-width: 100%;
     padding: 10px;
     border-radius: 15px;
-    font-size: 16px;
+    font-size: 1rem;
     line-height: 1.4;
 }
 

@@ -9,8 +9,8 @@
         <ion-list>
           <!-- 返回首页 -->
           <ion-item button @click="goHome">
-            <ion-icon slot="start" :icon="homeIcon"></ion-icon>
-            <ion-label>返回首頁</ion-label>
+            <ion-icon slot="start" :icon="homeIcon" :alt="returnHomeText" :aria-label="returnHomeText"></ion-icon>
+            <ion-label role="text">{{returnHomeText}}</ion-label>
           </ion-item>
           
           <!--
@@ -29,8 +29,8 @@
           -->
           <!-- 版本号 -->
           <ion-item>
-            <ion-icon slot="start" :icon="informationIcon"></ion-icon>
-            <ion-label>版本號：{{ version }}</ion-label>
+            <ion-icon slot="start" :icon="informationIcon" :alt="versionText" aria-label="versionText"></ion-icon>
+            <ion-label role="text">{{ versionText+" : "+version }}</ion-label>
           </ion-item>
         </ion-list>
       </ion-content>
@@ -59,9 +59,11 @@
     informationCircle as informationIcon,
   } from 'ionicons/icons';
 
-  const accountName = ref('使用者名稱'); // 使用者名稱{
-  const accountType = ref('admin'); // 使用者類型
+  //const accountName = ref('使用者名稱'); // 使用者名稱{
+  //const accountType = ref('admin'); // 使用者類型
   const version = ref('1.0.0'); // 版本號
+  const returnHomeText = ref('返回首頁'); // 返回首页的文字
+  const versionText = ref('版本號'); // 版本号的文字
   
   // 接收父组件传递的属性
   const props = defineProps({
@@ -111,17 +113,5 @@
   
   ion-item {
     --min-height: 50px;
-  }
-  
-  ion-label h2 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  ion-label p {
-    margin: 0;
-    font-size: 14px;
-    color: gray;
   }
   </style>

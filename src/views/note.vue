@@ -6,8 +6,9 @@
                     <ion-menu-button  :menu="commonMenuId"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課綱對齊</ion-title>
+                <h1 style="visibility:hidden;display: none;">{{pageTitle}}</h1>
                 <ion-button slot="end"  @click="openChat">
-                    <ion-icon :icon="chatboxEllipses"></ion-icon>
+                    <ion-icon :icon="chatboxEllipses"  alt="關閉的圖示" aria-label="關閉的圖示"></ion-icon>
                 </ion-button>
             </ion-toolbar>
         </ion-header>
@@ -186,6 +187,12 @@ const showChatModal = ref(false);
 const commonMenuId = ref('noteCommonMenu-'+route.params.sessionId+'-'+route.params.typ);
 const codesMenuId = ref('codesMenu'+route.params.sessionId+'-'+route.params.type);
 const mediaPlayerId = ref('mediaPlayer'+route.params.sessionId+'-'+route.params.type);
+const pageTitle = ref('');
+if (showAlignment.value) {
+    pageTitle.value = '課綱對齊';
+} else {
+    pageTitle.value = '課程筆記';
+}
 
 // Callback for IonModal "willDismiss" event
 function onChatModalWillDismiss() {
@@ -345,6 +352,7 @@ async function fetchSession() {
             player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
             player.referrerpolicy = 'strict-origin-when-cross-origin';
             player.allowFullscreen = true;
+            player.title = 'YouTube播放器';
 
         }else if(mediaType==='video'){
             // Create a video player

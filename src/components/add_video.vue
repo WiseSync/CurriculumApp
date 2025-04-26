@@ -5,7 +5,7 @@
                 <ion-title>加入課程</ion-title>
                 <ion-buttons slot="end">
                     <ion-button @click="hide">
-                        <ion-icon slot="icon-only" :icon="close"></ion-icon>
+                        <ion-icon slot="icon-only" :icon="close"  alt="關閉的圖示" aria-label="關閉的圖示"></ion-icon>
                     </ion-button>
                 </ion-buttons>
             </ion-toolbar>

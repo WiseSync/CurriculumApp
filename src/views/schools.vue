@@ -6,6 +6,7 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
           <ion-title slot = "start">學校/班級管理</ion-title>
+          <h1 style="visibility:hidden;display: none;">學校/班級管理</h1>
           <!-- <ion-buttons slot="end">
             <ion-button @click="openAddSchoolModal">
               <ion-icon slot="icon-only" :icon="addIcon"></ion-icon>
@@ -197,14 +198,14 @@ ion-item {
 }
 
 ion-label h2 {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: bold;
   color: #333;
   margin-bottom: 4px;
 }
 
 ion-label p {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #666;
   margin-bottom: 2px;
 }

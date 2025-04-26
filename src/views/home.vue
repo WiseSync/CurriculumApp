@@ -6,6 +6,7 @@
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
           <ion-title>首頁</ion-title>
+          <h1 style="visibility:hidden;display: none;">首頁</h1>
         </ion-toolbar>
       </ion-header>
     <ToggleMenu :contentId="contentId"/>
@@ -17,8 +18,8 @@
             <ion-col size="6">
               <ion-card @click="openApp(apps.course.route, {type: 'alignment'})">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.course.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.course.name }}</ion-label>
+                  <ion-icon :icon="apps.course.icon" class="app-icon" :alt="apps.course.name" :aria-label="apps.course.name" ></ion-icon>
+                  <ion-label class="app-label" role="text">{{ apps.course.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -26,8 +27,8 @@
             <ion-col size="6">
               <ion-card @click="openApp(apps.notes.route, {type: 'notes'})">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.notes.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.notes.name }}</ion-label>
+                  <ion-icon :icon="apps.notes.icon" class="app-icon"  :alt="apps.notes.name" :aria-label="apps.notes.name" ></ion-icon>
+                  <ion-label class="app-label" role="text">{{ apps.notes.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -36,8 +37,8 @@
             <ion-col size="6">
               <ion-card @click="openApp(apps.list.route)">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.list.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.list.name }}</ion-label>
+                  <ion-icon :icon="apps.list.icon" class="app-icon" :alt="apps.list.name" :aria-label="apps.list.name" ></ion-icon>
+                  <ion-label class="app-label" role="text">{{ apps.list.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -45,25 +46,12 @@
             <ion-col size="6">
               <ion-card @click="openApp(apps.device.route)">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.device.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.device.name }}</ion-label>
+                  <ion-icon :icon="apps.device.icon" class="app-icon" :alt="apps.device.name" :aria-label="apps.device.name" ></ion-icon>
+                  <ion-label class="app-label" role="text">{{ apps.device.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
           </ion-row>
-          <!--
-          <ion-row>
-
-            <ion-col size="6">
-              <ion-card @click="openApp(apps.classes.route)" disabled="true">
-                <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.classes.icon" class="app-icon"></ion-icon>
-                  <ion-label class="app-label">{{ apps.classes.name }}</ion-label>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        -->
         </ion-grid>
       </ion-content>
     </ion-page>

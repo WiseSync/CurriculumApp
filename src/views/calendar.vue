@@ -6,6 +6,7 @@
           <ion-menu-button :menu="commonMenuId"></ion-menu-button>
         </ion-buttons>
                 <ion-title slot="start">{{ pageTitle }}</ion-title>
+                <h1 style="visibility:hidden;display: none;">{{ pageTitle }}</h1>
                 <!-- <ion-button slot="end">
                     <ion-icon :icon="add"></ion-icon>
                 </ion-button> -->
@@ -85,7 +86,7 @@ import {
     IonButtons,
     IonMenuButton,
     IonRouterOutlet,
-    IonLabel
+    IonLabel, onIonViewDidEnter
 } from '@ionic/vue';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -200,7 +201,7 @@ function enterCourse() {
     });
 }
 
-onMounted(() => {
+onIonViewDidEnter(() => {
     const calendarApi = calendarRef.value.getApi();
     fetchCourses().then(() => {
         calendarApi.refetchEvents();
