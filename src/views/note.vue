@@ -487,9 +487,11 @@ async function fetchLearningPerformances(subject) {
  function getYouTubeId(url) {
   try {
     const parsed = new URL(url.trim());
-
+    //remove leading 'www.'
+    const hostname = parsed.hostname.toLowerCase().replace(/^www\./, '');
+    
     // Check short link style: youtu.be/<id>
-    if (parsed.hostname.includes('youtu.be')) {
+    if (hostname === 'youtu.be') {
       // /XXXXXXXXXXX
       const path = parsed.pathname.slice(1); // remove leading '/'
       if (path.length === 11) {
@@ -498,7 +500,7 @@ async function fetchLearningPerformances(subject) {
       return null;
     }
     // Otherwise, assume youtube.com/watch
-    else if (parsed.hostname.includes('youtube.com')) {
+    else if (hostname === 'youtube.com') {
       const vParam = parsed.searchParams.get('v');
       if (vParam && vParam.length === 11) {
         return vParam;
