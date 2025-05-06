@@ -3,7 +3,7 @@
       <ion-header>
         <ion-toolbar>
             <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button menu="deviceCommonMenu"></ion-menu-button>
         </ion-buttons>
           <ion-title slot="start">設備監控</ion-title>
           <h1 style="visibility:hidden;display: none;">設備監控</h1>
@@ -19,7 +19,7 @@
                 </ion-select>
         </ion-toolbar>
       </ion-header>
-      <ToggleMenu :content-id="contentId"/>
+      <ToggleMenu :content-id="contentId" menu-id="deviceCommonMenu"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
       <ion-content>
         <ion-grid>
@@ -80,7 +80,7 @@
   import { business,statsChart} from 'ionicons/icons';
   import ToggleMenu from '@/components/menu.vue';
   
-  const contentId = ref('menu-content');
+  const contentId = ref('device-content');
   const selectedStatus = ref('all');
   
   const devices = ref([

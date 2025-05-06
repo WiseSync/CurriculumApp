@@ -10,21 +10,47 @@
                 <!-- <ion-button slot="end">
                     <ion-icon :icon="add"></ion-icon>
                 </ion-button> -->
-                <ion-select label-placement="stacked" label="組織" value="school001" slot="end" class="CalendarCommonSelectOption">
-                    <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="school001">國家教育研究院</ion-select-option>
+                <ion-select
+                  label="組織"
+                  label-placement="stacked"
+                  v-model="selectedOrganizationId"
+                  @ionChange="onOrganizationChange($event.detail.value)"
+                  slot="end"
+                  class="CalendarCommonSelectOption"
+                >
+                  <ion-icon slot="start" :icon="business" aria-hidden="true"></ion-icon>
+                  <ion-select-option
+                    v-for="org in organizations"
+                    :key="org.id"
+                    :value="org.id"
+                  >
+                    {{ org.name }}
+                  </ion-select-option>
                 </ion-select>
 
-                <ion-select label-placement="stacked" label="班級" value="class001" slot="end" class="CalendarCommonSelectOption">
-                    <ion-icon slot="start" :icon="people" aria-hidden="true"></ion-icon>
-                    <ion-select-option value="class001">測評中心</ion-select-option>
+                <ion-select
+                  label="班級"
+                  label-placement="stacked"
+                  v-model="selectedDepartmentId"
+                  @ionChange="onDepartmentChange($event.detail.value)"
+                  slot="end"
+                  class="CalendarCommonSelectOption"
+                >
+                  <ion-icon slot="start" :icon="people" aria-hidden="true"></ion-icon>
+                  <ion-select-option
+                    v-for="dep in departments"
+                    :key="dep.id"
+                    :value="dep.id"
+                  >
+                    {{ dep.name }}
+                  </ion-select-option>
                 </ion-select>
-
+                <!--
                 <ion-select label-placement="stacked" label="裝置" value="device001" slot="end" class="CalendarCommonSelectOption CalendarDeviceOption">
                     <ion-icon slot="start" :icon="hardwareChip" aria-hidden="true"></ion-icon>
                     <ion-select-option value="device001">所有</ion-select-option>
                 </ion-select>
-
+            -->
             </ion-toolbar>
         </ion-header>
         <CommonMenu :content-id="contentId" :menu-id="commonMenuId"/>
@@ -101,6 +127,15 @@ import add_video from '../components/add_video.vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
 
+const baseApiUrl = AppConfig.ServiceUrl;
+const showLoading = ref(false);
+
+// dynamic org / department lists
+const organizations       = ref([]);   // [{id,name}]
+const departments         = ref([]);   // [{id,name}]
+const selectedOrganizationId = ref(null);
+const selectedDepartmentId   = ref(null);
+
 const calendarRef = ref(null);
 const selectedCourse = ref(null);
 const contentId = 'main-content';
@@ -134,6 +169,9 @@ const calendarOptions = {
         // 這裡我們使用 loadVideosAsCourses 函數來獲取事件數據
         fetchCourses().then((events) => {
             successCallback(events);
+            //const calendarApi = calendarRef.value.getApi();
+            //calendarApi.refetchEvents();
+        //calendarApi.render();
         }).catch(failureCallback);
     },
     eventClick: handleEventClick, // 事件點擊處理器
@@ -146,7 +184,10 @@ async function refreshCalendar() {
 }
 
 async function fetchCourses() {
-    const resp = await fetch(AppConfig.ServiceUrl+'/sessions')
+    if (!selectedDepartmentId.value) {
+        return [];
+    }
+    const resp  = await fetch(`${AppConfig.ServiceUrl}/departments/${selectedDepartmentId.value}/sessions`);
     if(!resp.ok) {
       //console.error('Failed to load videos:', resp.status, resp.statusText)
       throw new Error('Failed to load videos: ' + resp.status + ' ' + resp.statusText)
@@ -201,16 +242,67 @@ function enterCourse() {
     });
 }
 
+async function loadOrganizations () {
+  showLoading.value = true;
+  try {
+    const resp = await fetch(`${baseApiUrl}/organizations`);
+    if (!resp.ok) throw new Error('Failed to load organizations');
+    organizations.value = await resp.json();
+    if (organizations.value.length) {
+      selectedOrganizationId.value = organizations.value[0].id;
+      await loadDepartments(selectedOrganizationId.value);
+     // const last = localStorage.getItem('lastDepartment');
+     // if (last) {
+     //   selectedDepartmentId.value = Number(last);
+     // }
+    }
+  }  finally {
+    showLoading.value = false;
+  }
+}
+
+async function loadDepartments (orgId) {
+  if (!orgId) return;
+  showLoading.value = true;
+  try {
+    const resp = await fetch(`${baseApiUrl}/organizations/${orgId}/departments`);
+    if (!resp.ok) throw new Error('Failed to load departments');
+    departments.value = await resp.json();
+    //const oldVal = selectedDepartmentId.value;
+    selectedDepartmentId.value = departments.value.length ? departments.value[0].id : null;
+
+    refreshCalendar();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    showLoading.value = false;
+  }
+}
+
+async function onOrganizationChange (value) {
+  selectedOrganizationId.value = value;
+  await loadDepartments(value);
+  // refresh events once org / dep changes
+  refreshCalendar();
+}
+
+async function onDepartmentChange (value) {
+  selectedDepartmentId.value = value;
+  localStorage.setItem('lastDepartment', value);
+  refreshCalendar();
+}
+
+//onMounted(() => {
+ // loadOrganizations();
+//});
+
 onIonViewDidEnter(() => {
+   
+   loadOrganizations();
+   setTimeout(() => {
     const calendarApi = calendarRef.value.getApi();
-    fetchCourses().then(() => {
-        calendarApi.refetchEvents();
-        calendarApi.render();
-    });
-
-    /*
-    */
-
+    calendarApi.render();
+    }, 0);
 });
 </script>
 

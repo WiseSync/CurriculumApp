@@ -1,3 +1,7 @@
+import { setNonce } from '@ionic/core/loader';
+
+setNonce('OZRHt3ob7FPvfReQvpym2A==');
+
 import { createApp } from 'vue'
 import App from './app.vue'
 import router from './router';

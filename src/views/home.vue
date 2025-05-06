@@ -51,6 +51,14 @@
                 </ion-card-content>
               </ion-card>
             </ion-col>
+            <ion-col size="6">
+              <ion-card @click="openApp(apps.classes.route)">
+                <ion-card-content class="app-card">
+                  <ion-icon :icon="apps.classes.icon" class="app-icon" :alt="apps.classes.name" :aria-label="apps.classes.name" ></ion-icon>
+                  <ion-label class="app-label" role="text">{{ apps.classes.name }}</ion-label>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
           </ion-row>
         </ion-grid>
       </ion-content>
@@ -78,6 +86,7 @@
   // 导入图标
   import { cog, school, book, personCircle, people, list } from 'ionicons/icons';
   import ToggleMenu from '@/components/menu.vue';
+
 
   const contentId = 'home-content';
   const router = useRouter();
@@ -109,9 +118,9 @@
       route: 'Account',
     },
     classes: {
-      name: '班級管理',
+      name: '組織管理',
       icon: people,
-      route: 'Class',
+      route: 'Schools',
     },
   };
   
