@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import Meeting from '../views/calendar.vue';
 import Device from '../views/device.vue';
+import Meeting from '../views/calendar.vue';
 import Note from '../views/note.vue';
 import Home from '../views/home.vue';
 import Login from '../views/login.vue';

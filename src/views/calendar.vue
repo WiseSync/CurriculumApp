@@ -117,8 +117,7 @@ import {
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { ref, onMounted } from 'vue';
-import { business,people,hardwareChip,add, eye, closeCircle} from 'ionicons/icons';
+import { ref} from 'vue';
 import { menuController } from '@ionic/vue';
 import CommonMenu from '../components/menu.vue';
 import AppConfig from '../app_config';
@@ -126,6 +125,7 @@ import Utils from '../utils';
 import add_video from '../components/add_video.vue';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
+import { business,people,add, eye} from 'ionicons/icons';
 
 const baseApiUrl = AppConfig.ServiceUrl;
 const showLoading = ref(false);
