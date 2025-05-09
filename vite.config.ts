@@ -26,7 +26,7 @@ export default defineConfig({
   },
   server: {
     headers: {
-      'Content-Security-Policy':"default-src 'self';script-src 'self' 'nonce-OZRHt3ob7FPvfReQvpym2A=='; style-src 'self' 'unsafe-inline';font-src 'self' data:; img-src 'self' https://img.youtube.com/; frame-src 'self' https://www.youtube.com/; form-action 'none';connect-src 'self' http://localhost:8081 http://114.34.190.146:8081 http://localhost:8080 http://114.34.190.146:8080; frame-ancestors 'none'; base-uri 'self';",
+     // 'Content-Security-Policy':"default-src 'self';script-src 'self' 'nonce-OZRHt3ob7FPvfReQvpym2A=='; style-src 'self' 'unsafe-inline';font-src 'self' data:; img-src 'self' https://img.youtube.com/; frame-src 'self' https://www.youtube.com/; form-action 'none';connect-src 'self' http://localhost:8081 http://114.34.190.146:8081 http://localhost:8080 http://114.34.190.146:8080; frame-ancestors 'none'; base-uri 'self';",
       'X-Content-Type-Options': 'nosniff'
     }
 }
