@@ -7,6 +7,7 @@ import Login from '../views/login.vue';
 import Schools from '../views/schools.vue';
 import account from '../views/account.vue';
 import List from '../views/list.vue';
+import Utils from '../utils/Utils';
 
 const routes = [
   {
@@ -59,5 +60,28 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('token');
+  if (!isLoggedIn && to.name !== 'Login') {
+    next({ name: 'Login' });
+  } else {
+    next();
+  }
+});
+
+const isLoggedIn = !!localStorage.getItem('token');
+if (isLoggedIn) {
+  Utils.authenticate(localStorage.getItem('username'), localStorage.getItem('token'))
+    .then(() => {
+      console.log('User authenticated');
+    })
+    .catch((error) => {
+      console.error('Authentication failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      router.push({ name: 'Login' });
+    });
+}
 
 export default router
