@@ -22,27 +22,27 @@
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/timegrid": "6.1.17",
     "@fullcalendar/vue3": "^6.1.17",
-    "@ionic/core": "8.5.6",
-    "@ionic/vue": "8.5.6",
-    "@ionic/vue-router": "8.5.6",
+    "@ionic/core": "8.5.8",
+    "@ionic/vue": "8.5.8",
+    "@ionic/vue-router": "8.5.8",
     "@vitejs/plugin-basic-ssl": "2.0.0",
     "@vue/test-utils": "^2.4.6",
-    "ionicons": "7.4.0",
+    "ionicons": "8.0.8",
     "jsonschema": "1.5.0",
-    "vue": "3.5.13",
+    "vue": "3.5.16",
     "vue-router": "4.5.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.2.0",
     "@vitejs/plugin-legacy": "6.1.1",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "cypress": "14.3.2",
-    "eslint": "9.26.0",
+    "@vitejs/plugin-vue": "5.2.4",
+    "cypress": "14.4.0",
+    "eslint": "9.27.0",
     "jsdom": "26.1.0",
-    "terser": "5.39.0",
+    "terser": "5.40.0",
     "typescript": "5.8.3",
     "vite": "6.3.5",
-    "vitest": "3.1.3"
+    "vitest": "3.1.4"
   },
   "description": "An Ionic project"
 }

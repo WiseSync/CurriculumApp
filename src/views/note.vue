@@ -431,17 +431,6 @@ async function fetchSegments() {
     // If cat has a codes array, push them
     if (cat.codes) {
         allCodes.push(...cat.codes);
-        /*
-      for (const code of cat.codes) {
-        // Check if the code is already in allCodes
-        
-        if (!allCodes[code.id]) {
-          allCodes[code.id] = code;
-        }else{
-            // If the code already exists, append the new text
-            console.warn(`Duplicate code found: ${code.id}`);
-        }
-      }*/
     }
     // If cat has subcategories, recurse
     if (cat.subcategories) {
@@ -482,6 +471,25 @@ async function fetchLearningPerformances(subject) {
     }
     const data = await resp.json();
     learningCodes["performance"] = extractAllCodes(data);
+}
+
+/**
+ * Remove codes inside each segment that do not exist in the overall learningCodes list.
+ * Ensures segment.codes only keeps valid codes present in learningCodes.
+ */
+function filterSegmentCodes() {
+    segments.value.forEach(segment => {
+        ['content', 'performance'].forEach(type => {
+            const codesObj = segment.codes[type];
+            if (!codesObj) return;
+            Object.keys(codesObj).forEach(id => {
+                const exists = learningCodes[type]?.some(c => c.id === id);
+                if (!exists) {
+                    delete codesObj[id];
+                }
+            });
+        });
+    });
 }
 
 /**
@@ -528,6 +536,9 @@ onIonViewDidEnter(async () => {
         await fetchSession();
         await fetchLearningContents(metadata.value.subject);
         await fetchLearningPerformances(metadata.value.subject);
+
+        // Filter out any codes in segments that are not present in learningCodes
+        filterSegmentCodes();
         
         const fullText = segments.value.map(segment => segment.text).join('');
 
