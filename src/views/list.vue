@@ -21,7 +21,7 @@
                 <IonItem v-for="video in courses" :key="video.id" button="true" @click="onVideoClick(video)">
                     <!-- YouTube Thumbnail -->
                     <IonThumbnail slot="start">
-                        <IonImg :src="getThumbnailUrl(video)" :alt="video.title+的縮圖" :aria-label="video.title+的縮圖" />
+                        <IonImg :src="getThumbnailUrl(video)" :alt="video.title+'的縮圖'" :aria-label="video.title+'的縮圖'" />
                     </IonThumbnail>
 
                     <!-- Title and status info -->

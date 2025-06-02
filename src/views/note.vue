@@ -390,6 +390,19 @@ function arrayToObject(arr) {
     return obj;
 }
 
+function filtrSegmentsText(segments){
+    const newSegments = [];
+    segments.forEach(segment => {
+        segment.text = segment.text.replace("加入標點符號，並輸出繁體中文。", "");
+
+        if(segment.text.length>0){
+            newSegments.push(segment);
+        }
+    });
+
+    return newSegments;
+}
+
 async function fetchSegments() {
     const sessionId = route.params.sessionId;
     if (sessionId) {
@@ -405,8 +418,8 @@ async function fetchSegments() {
             segment.codes["content"] = arrayToObject(segment.contentCodes);
             segment.codes["performance"] = arrayToObject(segment.performanceCodes);
         }
-
-        segments.value = data.segments;
+        //To do: workaround to remove 加入標點符號，並輸出繁體中文。 text
+        segments.value = filtrSegmentsText(data.segments);
         
 
         for (let i = 0; i < segments.value.length; i++) {
