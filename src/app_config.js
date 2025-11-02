@@ -6,7 +6,7 @@ let BaseUrl = '';
 if (url.hostname === 'localhost') {
     BaseUrl = `http://localhost:${BasePort}`;
 } else {
-    BaseUrl = `${url.protocol}//${url.hostname}:${BasePort}`;
+    BaseUrl = "https://ej6clo2cklahc0-8080.proxy.runpod.net";
 }
 export default class AppConfig {
     static ASRServiceUrl= 'ws://localhost:8081';
