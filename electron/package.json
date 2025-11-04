@@ -32,7 +32,7 @@
     "vite-plugin-static-copy": "^2.3.1"
   },
   "devDependencies": {
-    "electron": "29.1.5",
+    "electron": "35.7.5",
     "electron-builder": "^24.13.3",
     "typescript": "^5.0.4",
     "@vitejs/plugin-legacy": "^6.0.2",
