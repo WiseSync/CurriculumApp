@@ -3,16 +3,18 @@
       <ion-header>
         <ion-toolbar>
             <ion-buttons slot="start">
-                <ion-menu-button menu="schoolsCommonMenu"></ion-menu-button>
+                <ion-menu-button menu="schoolsCommonMenu" aria-label="開啟選單"></ion-menu-button>
         </ion-buttons>
           <ion-title slot = "start">組織管理</ion-title>
-          <h1 style="visibility:hidden;display: none;">組織管理</h1>
+
       </ion-toolbar>
       </ion-header>
       <ToggleMenu :content-id="contentId" menu-id="schoolsCommonMenu"></ToggleMenu>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
   
-      <ion-content :id="contentId">
+      <ion-content :id="contentId" role="main" aria-labelledby="page-title">
+  <h1 id="page-title" class="visually-hidden">組織管理</h1>
+  <p id="departments-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ departmentsStatus }}</p>
   <!-- Organization selector -->
   <ion-item lines="full">
     <ion-label>學校/組織</ion-label>
@@ -38,8 +40,10 @@
         @click="editOrganization(
           organizations.find(o => o.id === selectedOrganizationId)
         )"
+        :aria-label="selectedOrganization ? `編輯「${selectedOrganization.name}」` : '編輯（請先選擇）'"
+        type="button"
       >
-        <ion-icon :icon="createIcon"></ion-icon>
+        <ion-icon :icon="createIcon" aria-hidden="true"></ion-icon>
       </ion-button>
       <ion-button
         size="small"
@@ -48,8 +52,10 @@
         @click="deleteOrganization(
           organizations.find(o => o.id === selectedOrganizationId)
         )"
+        :aria-label="selectedOrganization ? `刪除「${selectedOrganization.name}」` : '刪除（請先選擇）'"
+        type="button"
       >
-        <ion-icon :icon="trashIcon"></ion-icon>
+        <ion-icon :icon="trashIcon" aria-hidden="true"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-item>
@@ -59,23 +65,30 @@
     <ion-label position="stacked">班級/部門</ion-label>
     <ion-searchbar
       v-model="searchQuery"
-      placeholder="搜尋班級"
+      placeholder="搜尋班級/部門"
+      aria-label="搜尋班級/部門"
+      inputmode="search"
+      enterkeyhint="search"
       debounce="300"
+      :aria-controls="'departments-list'"
+      aria-describedby="departments-status"
     ></ion-searchbar>
   </ion-item>
 
-  <ion-list>
+  <ion-list id="departments-list" role="list" :aria-describedby="'departments-status'">
     <ion-item
       v-for="dep in filteredDepartments"
       :key="dep.id"
+      role="listitem"
+      :aria-labelledby="`dep-${dep.id}-label`"
     >
-      <ion-label>{{ dep.name }}</ion-label>
+      <ion-label :id="`dep-${dep.id}-label`">{{ dep.name }}</ion-label>
       <ion-buttons slot="end">
-        <ion-button size="small" @click="editDepartment(dep)">
-          <ion-icon :icon="createIcon"></ion-icon>
+        <ion-button size="small" @click="editDepartment(dep)" :aria-label="`編輯「${dep.name}」`" type="button">
+          <ion-icon :icon="createIcon" aria-hidden="true"></ion-icon>
         </ion-button>
-        <ion-button size="small" color="danger" @click="deleteDepartment(dep)">
-          <ion-icon :icon="trashIcon"></ion-icon>
+        <ion-button size="small" color="danger" @click="deleteDepartment(dep)" :aria-label="`刪除「${dep.name}」`" type="button">
+          <ion-icon :icon="trashIcon" aria-hidden="true"></ion-icon>
         </ion-button>
       </ion-buttons>
     </ion-item>
@@ -83,22 +96,23 @@
 
   <!-- FAB for adding department -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button>
-      <ion-icon :icon="addIcon"></ion-icon>
+    <ion-fab-button aria-label="新增">
+      <ion-icon :icon="addIcon" aria-hidden="true"></ion-icon>
     </ion-fab-button>
 
     <ion-fab-list side="top">
-      <ion-fab-button @click="addOrganization">
-        <ion-icon :icon="businessIcon"></ion-icon>
+      <ion-fab-button @click="addOrganization" aria-label="新增學校/組織">
+        <ion-icon :icon="businessIcon" aria-hidden="true"></ion-icon>
       </ion-fab-button>
-      <ion-fab-button :disabled="!selectedOrganizationId" @click="addDepartment">
-        <ion-icon :icon="peopleIcon"></ion-icon>
+      <ion-fab-button :disabled="!selectedOrganizationId" @click="addDepartment" :aria-label="selectedOrganization ? '新增班級/部門' : '新增班級/部門（請先選擇學校/組織）'">
+        <ion-icon :icon="peopleIcon" aria-hidden="true"></ion-icon>
       </ion-fab-button>
     </ion-fab-list>
   </ion-fab>
   <!-- Loading Spinner -->
-  <div v-if="showLoading" style="text-align:center;margin-top:2rem;">
-    <ion-spinner name="crescent"></ion-spinner>
+  <div v-if="showLoading" style="text-align:center;margin-top:2rem;" role="status" aria-live="polite" aria-atomic="true">
+    <ion-spinner name="crescent" aria-hidden="true"></ion-spinner>
+    <span class="visually-hidden">資料載入中…</span>
   </div>
 </ion-content>
     </ion-page>
@@ -156,6 +170,12 @@ const filteredDepartments = computed(() => {
   if (!searchQuery.value) return departments.value;
   return departments.value.filter(d => d.name.includes(searchQuery.value));
 });
+const departmentsStatus = computed(() =>
+  filteredDepartments.value.length ? `共 ${filteredDepartments.value.length} 個班級/部門` : '無符合結果'
+);
+const selectedOrganization = computed(() =>
+  organizations.value.find(o => o.id === selectedOrganizationId.value) || null
+);
 
 /* ----------------- lifecycle ----------------- */
 onIonViewDidEnter(() => {
@@ -432,5 +452,22 @@ ion-button {
 
 ion-icon {
   font-size: 20px;
+}
+
+:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
 }
     </style>

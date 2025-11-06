@@ -3,10 +3,10 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-menu-button menu="deviceCommonMenu"></ion-menu-button>
+          <ion-menu-button menu="deviceCommonMenu" aria-label="開啟選單"></ion-menu-button>
         </ion-buttons>
         <ion-title slot="start">設備監控</ion-title>
-        <h1 style="visibility:hidden;display: none;">設備監控</h1>
+
         <ion-select
           label-placement="stacked"
           label="學校"
@@ -33,30 +33,38 @@
     </ion-header>
     <ToggleMenu :content-id="contentId" menu-id="deviceCommonMenu" />
     <ion-router-outlet :id="contentId"></ion-router-outlet>
-    <ion-content>
+    <ion-content :id="contentId" role="main" aria-labelledby="page-title">
+      <h1 id="page-title" class="visually-hidden">設備監控</h1>
+      <p id="devices-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ devicesStatus }}</p>
       <ion-grid>
         <ion-row>
           <ion-col
             size="6"
             size-md="2"
-            v-for="device in filterDevices()"
+            v-for="device in visibleDevices"
             :key="device.id"
           >
-            <ion-card @click="goToDeviceDetail(device)">
+            <ion-card role="link" tabindex="0"
+              :aria-labelledby="`device-${device.id}-title`"
+              :aria-describedby="`device-${device.id}-subtitle device-${device.id}-status`"
+              @click="goToDeviceDetail(device)"
+              @keydown.enter.prevent="goToDeviceDetail(device)"
+              @keydown.space.prevent="goToDeviceDetail(device)">
               <ion-card-header>
                 <ion-avatar>
                   <ion-icon
                     :icon="device.icon"
                     size="large"
                     class="device-ion-icon"
+                    aria-hidden="true"
                   ></ion-icon>
                 </ion-avatar>
-                <ion-card-title>{{ device.name }}</ion-card-title>
-                <ion-card-subtitle>{{ device.school }} - {{ device.class }}</ion-card-subtitle>
+                <ion-card-title :id="`device-${device.id}-title`">{{ device.name }}</ion-card-title>
+                <ion-card-subtitle :id="`device-${device.id}-subtitle`">{{ device.school }} - {{ device.class }}</ion-card-subtitle>
               </ion-card-header>
               <ion-card-content>
-                <ion-badge :color="getStatusColor(device.status)">
-                  {{ device.status }}
+                <ion-badge :color="getStatusColor(device.status)" :id="`device-${device.id}-status`" :aria-label="`狀態：${getStatusName(device.status)}`">
+                  {{ getStatusName(device.status) }}
                 </ion-badge>
               </ion-card-content>
             </ion-card>
@@ -68,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { onIonViewDidEnter, onIonViewWillLeave } from '@ionic/vue';
 import AppConfig from '../app_config';
 import {
@@ -103,6 +111,16 @@ const selectedStatus = ref('all');
 const devices = ref([]);
 let refreshTimer = null;
 const baseApiUrl = AppConfig.ServiceUrl;
+
+const visibleDevices = computed(() =>
+  selectedStatus.value === 'all'
+    ? devices.value
+    : devices.value.filter(device => device.status === selectedStatus.value)
+);
+
+const devicesStatus = computed(() =>
+  visibleDevices.value.length ? `共 ${visibleDevices.value.length} 台裝置` : '無裝置'
+);
 
 function mapStatus(code, updateDate) {
   const now = Date.now();
@@ -153,6 +171,21 @@ onIonViewWillLeave(() => {
     clearInterval(refreshTimer);
   }
 });
+
+function getStatusName(status) {
+  switch (status) {
+    case 'idle':
+      return '待機中';
+    case 'recording':
+      return '錄製中';
+    case 'offline':
+      return '離線中';
+    case 'malfunction':
+      return '故障';
+    default:
+      return status;
+  }
+}
 
 function getStatusColor(status) {
   switch (status) {
@@ -220,5 +253,22 @@ ion-badge {
 }
 .DeviceStatsOption {
   width: 6.25rem;
+}
+
+:focus-visible {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
 }
 </style>

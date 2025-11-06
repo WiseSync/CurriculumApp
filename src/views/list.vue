@@ -3,30 +3,32 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button menu="listCommonMenu"></ion-menu-button>
+                    <ion-menu-button menu="listCommonMenu" aria-label="開啟選單"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課程列表</ion-title>
-                <h1 style="visibility:hidden;display: none;">課程列表</h1>
+
             </ion-toolbar>
         </ion-header>
         <CommonMenu content-id="ListContent" menu-id="listCommonMenu" />
         <IonFab slot="fixed" vertical="bottom" horizontal="end">
-            <IonFabButton @click="openAddVideoAlert">
-                <IonIcon :icon="add" alt="加入的圖示" aria-label="加入的圖示"/> <!-- displays a "+" icon -->
+            <IonFabButton @click="openAddVideoAlert" aria-label="新增影片">
+                <IonIcon :icon="add" aria-hidden="true"/> <!-- displays a "+" icon -->
             </IonFabButton>
         </IonFab>
-        <IonContent id="ListContent">
+        <IonContent id="ListContent" role="main" aria-labelledby="page-title">
 
-            <IonList>
-                <IonItem v-for="video in courses" :key="video.id" button="true" @click="onVideoClick(video)">
+            <h1 id="page-title" class="visually-hidden">課程列表</h1>
+            <p id="videos-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ videosStatus }}</p>
+            <IonList id="courses-list" role="list" :aria-describedby="'videos-status'">
+                <IonItem v-for="video in courses" :key="video.id" button="true" @click="onVideoClick(video)" :aria-labelledby="`video-${video.id}-title`">
                     <!-- YouTube Thumbnail -->
                     <IonThumbnail slot="start">
-                        <IonImg :src="getThumbnailUrl(video)" :alt="video.title+'的縮圖'" :aria-label="video.title+'的縮圖'" />
+                        <IonImg :src="getThumbnailUrl(video)" :alt="video.title+'的縮圖'" />
                     </IonThumbnail>
 
                     <!-- Title and status info -->
                     <IonLabel>
-                        <h3>{{ Utils.subjectText(video.subject) + "科: " + (video.title === null ? "無標題" : video.title) }}</h3>
+                        <h3 :id="`video-${video.id}-title`">{{ Utils.subjectText(video.subject) + "科: " + (video.title === null ? "無標題" : video.title) }}</h3>
                         <!-- Error message displayed if status is error: -->
                         <IonLabel color="medium" style="font-size: small;">
                             {{ timeText(video.duration) }}
@@ -39,14 +41,22 @@
                         </IonNote>
                         <!-- Progress bar for processing states: -->
                         <IonProgressBar v-if="video.status !== 'done' && video.status !== 'error'"
-                            :value="getProgressValue(video.status)" color="medium">
+                            :value="getProgressValue(video.status)" color="medium"
+                            role="progressbar"
+                            aria-label="處理進度"
+                            aria-valuemin="0" aria-valuemax="100"
+                            :aria-valuenow="Math.round(getProgressValue(video.status) * 100)"
+                            :aria-valuetext="Utils.statusText(video.status)">
                         </IonProgressBar>
                     </IonLabel>
 
                     <!-- Delete icon (trash can) -->
-                    <IonIcon slot="end" :icon="refresh" v-if="video.status === 'error'" alt="更新的圖示" aria-label="更新的圖示"
-                        @click.stop="resumeVideo(video.id)" />
-                    <IonIcon slot="end" :icon="trash" @click.stop="deleteVideo(video)"  alt="刪除的圖示" aria-label="刪除的圖示"/>
+                    <IonButton slot="end" v-if="video.status === 'error'" @click.stop="resumeVideo(video.id)" :aria-label="`重新處理：${video.title === null ? '無標題' : video.title}`" type="button">
+                        <IonIcon :icon="refresh" aria-hidden="true" slot="icon-only" />
+                    </IonButton>
+                    <IonButton slot="end" color="danger" @click.stop="deleteVideo(video)" :aria-label="`刪除：${video.title === null ? '無標題' : video.title}`" type="button">
+                        <IonIcon :icon="trash" aria-hidden="true" slot="icon-only" />
+                    </IonButton>
                 </IonItem>
             </IonList>
         </IonContent>
@@ -56,10 +66,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import {
     IonList, IonItem, IonThumbnail, IonImg, IonLabel, IonNote, IonProgressBar, alertController,
-    IonIcon, IonFab, IonFabButton, IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton,
+    IonIcon, IonButton, IonFab, IonFabButton, IonPage, IonHeader, IonToolbar, IonButtons, IonTitle, IonMenuButton,
     IonContent,onIonViewDidEnter,onIonViewWillLeave, IonLoading
 } from '@ionic/vue';
 import { add, trash, refresh } from 'ionicons/icons';  // (importing the icon if needed for IonFabButton)
@@ -74,6 +84,7 @@ const courses = ref([]);
 const addVideoDialog = ref(null);
 const router = useRouter();
 const showLoading = ref(false);
+const videosStatus = computed(() => courses.value.length ? `共 ${courses.value.length} 筆課程` : '目前無課程');
 
 
 function openAddVideoAlert() {
@@ -228,5 +239,20 @@ onIonViewWillLeave(() => {
 #ion-add-note {
     display: flex;
     justify-content: center;
+}
+:focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+}
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    margin: -1px;
 }
 </style>

@@ -3,12 +3,12 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button  :menu="commonMenuId"></ion-menu-button>
+                    <ion-menu-button  :menu="commonMenuId" aria-label="開啟選單"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課綱對齊</ion-title>
-                <h1 style="visibility:hidden;display: none;">{{pageTitle}}</h1>
-                <ion-button slot="end"  @click="openChat">
-                    <ion-icon :icon="chatboxEllipses"  alt="關閉的圖示" aria-label="關閉的圖示"></ion-icon>
+
+                <ion-button slot="end"  @click="openChat" aria-label="開啟聊天視窗" type="button">
+                    <ion-icon :icon="chatboxEllipses" aria-hidden="true"></ion-icon>
                 </ion-button>
             </ion-toolbar>
         </ion-header>
@@ -18,16 +18,21 @@
 
         <ion-menu side="end" :content-id="contentId" :menu-id="codesMenuId" type="overlay" style="--width:35%">
             <ion-header>
-                <ion-searchbar placeholder="編碼或定義" slot="start" @ionInput="filterCodesInEditMenu($event)"></ion-searchbar>
+                <ion-searchbar placeholder="搜尋編碼或定義" aria-label="搜尋編碼或定義" inputmode="search" enterkeyhint="search" slot="start" @ionInput="filterCodesInEditMenu($event)" :aria-controls="'codes-list'" aria-describedby="codes-status"></ion-searchbar>
+            </ion-header>
+            <ion-content>
+                <p id="codes-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ codesStatus }}</p>
+                <ion-list id="codes-list" role="list" :aria-describedby="'codes-status'">
+                <ion-searchbar placeholder="搜尋編碼或定義" aria-label="搜尋編碼或定義" inputmode="search" enterkeyhint="search" slot="start" @ionInput="filterCodesInEditMenu($event)" :aria-controls="'codes-list'" aria-describedby="codes-status"></ion-searchbar>
             </ion-header>
             <ion-content>
                 <ion-list>
-                    <ion-item v-for="(item) in selectedCodes" :key="item.id">
+                    <ion-item v-for="(item) in selectedCodes" :key="item.id" role="listitem" :aria-labelledby="`code-${item.id}-title`">
                         <ion-label>
                             <div class="classification-select-item-title">
-                                <h2>{{ item.id }}</h2>
+                                <h2 :id="`code-${item.id}-title`">{{ item.id }}</h2>
                                 <div>
-                                    <ion-badge v-if="isAISelectedCode(item.id)" class="note-properties-badge">AI</ion-badge>
+                                    <ion-badge v-if="isAISelectedCode(item.id)" class="note-properties-badge" aria-label="AI 建議">AI</ion-badge>
                                 </div>
                             </div>
                             <p>{{ item.description }}</p>
@@ -35,7 +40,7 @@
                                 color="secondary">({{ aiReason(item.id) }})</ion-text>
 
                         </ion-label>
-                        <ion-toggle slot="end" :checked="isUserSelectedCode(item.id)" @ionChange="toggleSelection(item.id)"></ion-toggle>
+                        <ion-toggle slot="end" :checked="isUserSelectedCode(item.id)" @ionChange="toggleSelection(item.id)" :aria-label="`選取 ${item.id}：${item.description}`"></ion-toggle>
                     </ion-item>
                 </ion-list>
             </ion-content>
@@ -43,7 +48,9 @@
         <ion-menu-toggle auto-hide="false">
             <ion-button id="open-menu" style="display: none;"></ion-button>
         </ion-menu-toggle>
-        <ion-content :id="contentId" >
+        <ion-content :id="contentId" role="main" aria-labelledby="page-title" >
+            <h1 id="page-title" class="visually-hidden">{{ pageTitle }}</h1>
+            <p id="segments-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ segmentsStatus }}</p>
             <!-- 显示元数据 -->
             <div  style="display: flex;">
             <ion-card v-if="!showLoading" style="width: 85%;">
@@ -77,13 +84,12 @@
 
                 <!-- 匹配的学习内容 ID -->
                 <ion-item v-if="showAlignment">
-                    <ion-label class="classification-label codes-type-label" color="secondary"
-                        style="font-weight: 500;" @click="openCodesMenu(segment,'content')">學習內容編碼</ion-label>
+                    <ion-button fill="clear" class="classification-label codes-type-label" color="secondary" style="font-weight: 500;" @click="openCodesMenu(segment,'content')" aria-haspopup="menu" type="button">學習內容編碼</ion-button>
                     <div  v-for="tag in Object.values(segment.codes['content']).filter(t => t.userSelected)">
                         <ion-badge class="note-properties-badge"
-                            :id="'content-badge-' + index + '_' + tag.id">{{ tag.id }}</ion-badge>
+                            :id="'content-badge-' + index + '_' + tag.id" role="button" tabindex="0" @keydown.enter.prevent="$event.target.click()" @keydown.space.prevent="$event.target.click()">{{ tag.id }}</ion-badge>
                         <ion-popover :trigger="'content-badge-' + index + '_' + tag.id"
-                            trigger-action="hover">
+                            trigger-action="click">
                             <ion-content class="ion-padding">{{ tag.reason }}</ion-content>
                         </ion-popover>
                     </div>
@@ -91,12 +97,11 @@
                 </ion-item>
                 <!-- 匹配的学习表现 ID -->
                 <ion-item v-if="showAlignment">
-                    <ion-label class="classification-label codes-type-label" color="secondary"
-                        style="font-weight: 500;" @click="openCodesMenu(segment,'performance')">學習表現編碼</ion-label>
+                    <ion-button fill="clear" class="classification-label codes-type-label" color="secondary" style="font-weight: 500;" @click="openCodesMenu(segment,'performance')" aria-haspopup="menu" type="button">學習表現編碼</ion-button>
                     <div  v-for="tag in Object.values(segment.codes['performance']).filter(t => t.userSelected)">
                         <ion-badge  class="note-properties-badge"
-                            :id="'performance-badge-' + index + '_' + tag.id">{{ tag.id }}</ion-badge>
-                        <ion-popover :trigger="'performance-badge-' + index + '_' + tag.id" trigger-action="hover">
+                            :id="'performance-badge-' + index + '_' + tag.id" role="button" tabindex="0" @keydown.enter.prevent="$event.target.click()" @keydown.space.prevent="$event.target.click()">{{ tag.id }}</ion-badge>
+                        <ion-popover :trigger="'performance-badge-' + index + '_' + tag.id" trigger-action="click">
                             <ion-content class="ion-padding">{{ tag.reason }}</ion-content>
                         </ion-popover>
                     </div>
@@ -110,7 +115,7 @@
 
         </ion-content>
         <ion-modal :is-open="showChatModal" swipe-to-close="true" presenting-element="ion-router-outlet"
-                @will-dismiss="onChatModalWillDismiss">
+                @will-dismiss="onChatModalWillDismiss" aria-label="聊天視窗">
                 <ChatBox @closed="onChatModalWillDismiss" :userAvatar="unknownImgUrl" :dialogHistory="chatDialogHistory" />
             </ion-modal>
     <!--
@@ -122,7 +127,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
     IonPage,
     IonHeader,
@@ -178,6 +183,8 @@ const metadata = ref({
     deviceId: 'hsntnu-0107',
 });
 const selectedCodes = ref({});
+const segmentsStatus = computed(() => segments.value.length ? `共 ${segments.value.length} 段內容` : '目前無內容');
+const codesStatus = computed(() => Array.isArray(selectedCodes.value) ? (selectedCodes.value.length ? `共 ${selectedCodes.value.length} 個編碼` : '無編碼') : (selectedCodes.value && Object.keys(selectedCodes.value).length ? `共 ${Object.keys(selectedCodes.value).length} 個編碼` : '無編碼'));
 const selectedSegment = ref(null);
 const selectedCodesType = ref('content');
 const learningCodes = {};
@@ -628,5 +635,22 @@ cursor: pointer;
 
 .classification-select-item-title {
     display: flex;
+}
+
+:focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    margin: -1px;
 }
 </style>

@@ -3,59 +3,75 @@
       <ion-header>
         <ion-toolbar>
             <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button aria-label="開啟選單"></ion-menu-button>
         </ion-buttons>
           <ion-title>首頁</ion-title>
-          <h1 style="visibility:hidden;display: none;">首頁</h1>
+
         </ion-toolbar>
       </ion-header>
     <ToggleMenu :contentId="contentId"/>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
-      <ion-content :id="contentId">
+      <ion-content :id="contentId" role="main" aria-labelledby="page-title">
+        <h1 id="page-title" class="visually-hidden">首頁</h1>
         <ion-grid>
           <ion-row>
             <!-- 課表 -->
             <ion-col size="6">
-              <ion-card @click="openApp(apps.course.route, {type: 'alignment'})">
+              <ion-card role="link" tabindex="0" :aria-labelledby="'course-label'"
+                @click="openApp(apps.course.route, {type: 'alignment'})"
+                @keydown.enter.prevent="openApp(apps.course.route, {type: 'alignment'})"
+                @keydown.space.prevent="openApp(apps.course.route, {type: 'alignment'})">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.course.icon" class="app-icon" :alt="apps.course.name" :aria-label="apps.course.name" ></ion-icon>
-                  <ion-label class="app-label" role="text">{{ apps.course.name }}</ion-label>
+                  <ion-icon :icon="apps.course.icon" class="app-icon" aria-hidden="true"></ion-icon>
+                  <ion-label class="app-label" :id="'course-label'">{{ apps.course.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
-            <!-- 课程笔记 -->
+            <!-- 課程筆記 -->
             <ion-col size="6">
-              <ion-card @click="openApp(apps.notes.route, {type: 'notes'})">
+              <ion-card role="link" tabindex="0" :aria-labelledby="'notes-label'"
+                @click="openApp(apps.notes.route, {type: 'notes'})"
+                @keydown.enter.prevent="openApp(apps.notes.route, {type: 'notes'})"
+                @keydown.space.prevent="openApp(apps.notes.route, {type: 'notes'})">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.notes.icon" class="app-icon"  :alt="apps.notes.name" :aria-label="apps.notes.name" ></ion-icon>
-                  <ion-label class="app-label" role="text">{{ apps.notes.name }}</ion-label>
+                  <ion-icon :icon="apps.notes.icon" class="app-icon" aria-hidden="true"></ion-icon>
+                  <ion-label class="app-label" :id="'notes-label'">{{ apps.notes.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col size="6">
-              <ion-card @click="openApp(apps.list.route)">
+              <ion-card role="link" tabindex="0" :aria-labelledby="'list-label'"
+                @click="openApp(apps.list.route)"
+                @keydown.enter.prevent="openApp(apps.list.route)"
+                @keydown.space.prevent="openApp(apps.list.route)">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.list.icon" class="app-icon" :alt="apps.list.name" :aria-label="apps.list.name" ></ion-icon>
-                  <ion-label class="app-label" role="text">{{ apps.list.name }}</ion-label>
+                  <ion-icon :icon="apps.list.icon" class="app-icon" aria-hidden="true"></ion-icon>
+                  <ion-label class="app-label" :id="'list-label'">{{ apps.list.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
-            <!-- 装置管理 -->
+            <!-- 裝置管理 -->
             <ion-col size="6">
-              <ion-card @click="openApp(apps.device.route)">
+              <ion-card role="link" tabindex="0" :aria-labelledby="'device-label'"
+                @click="openApp(apps.device.route)"
+                @keydown.enter.prevent="openApp(apps.device.route)"
+                @keydown.space.prevent="openApp(apps.device.route)">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.device.icon" class="app-icon" :alt="apps.device.name" :aria-label="apps.device.name" ></ion-icon>
-                  <ion-label class="app-label" role="text">{{ apps.device.name }}</ion-label>
+                  <ion-icon :icon="apps.device.icon" class="app-icon" aria-hidden="true"></ion-icon>
+                  <ion-label class="app-label" :id="'device-label'">{{ apps.device.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
             <ion-col size="6">
-              <ion-card @click="openApp(apps.classes.route)">
+              <ion-card role="link" tabindex="0" :aria-labelledby="'classes-label'"
+                @click="openApp(apps.classes.route)"
+                @keydown.enter.prevent="openApp(apps.classes.route)"
+                @keydown.space.prevent="openApp(apps.classes.route)">
                 <ion-card-content class="app-card">
-                  <ion-icon :icon="apps.classes.icon" class="app-icon" :alt="apps.classes.name" :aria-label="apps.classes.name" ></ion-icon>
-                  <ion-label class="app-label" role="text">{{ apps.classes.name }}</ion-label>
+                  <ion-icon :icon="apps.classes.icon" class="app-icon" aria-hidden="true"></ion-icon>
+                  <ion-label class="app-label" :id="'classes-label'">{{ apps.classes.name }}</ion-label>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -98,7 +114,7 @@
       route: 'Device',
     },
     course: {
-      name: '课程表',
+      name: '課程表',
       icon: school,
       route: 'Calendar',
     },
@@ -151,5 +167,26 @@
     margin-top: 8px;
     font-size: 1rem;
     color: var(--ion-color-dark);
+  }
+
+  :focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+  }
+  ion-card[tabindex]:focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    margin: -1px;
   }
   </style>

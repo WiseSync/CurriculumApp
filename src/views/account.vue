@@ -3,7 +3,7 @@
       <ion-header>
         <ion-toolbar>
             <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+          <ion-menu-button aria-label="開啟選單"></ion-menu-button>
         </ion-buttons>
           <ion-title slot="start">帳號管理</ion-title>
           <ion-buttons slot="end">
@@ -11,27 +11,38 @@
               <ion-icon slot="icon-only" :icon="addIcon"></ion-icon>
             </ion-button> -->
           </ion-buttons>
-          <ion-searchbar v-model="searchQuery" placeholder="搜索姓名或ID" slot="start"></ion-searchbar>
+          <ion-searchbar
+            v-model="searchQuery"
+            placeholder="搜尋姓名或ID"
+            aria-label="搜尋姓名或ID"
+            inputmode="search"
+            enterkeyhint="search"
+            slot="start"
+            :aria-controls="'accounts-list'"
+            aria-describedby="results-status"
+          ></ion-searchbar>
         </ion-toolbar>
       </ion-header>
       <ToggleMenu :content-id="contentId"
     ></ToggleMenu>
     <ion-router-outlet :id="contentId"></ion-router-outlet>
-      <ion-content :id="contentId">
-        <ion-list>
-          <ion-item v-for="(account, index) in filteredAccounts" :key="index">
+      <ion-content :id="contentId" role="main" aria-labelledby="page-title">
+        <h1 id="page-title" class="visually-hidden">帳號管理</h1>
+        <p id="results-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ resultsStatus }}</p>
+        <ion-list id="accounts-list" role="list" :aria-describedby="'results-status'">
+          <ion-item v-for="(account, index) in filteredAccounts" :key="index" role="listitem" :aria-labelledby="`account-${index}-title`">
             <ion-label>
-              <h2>{{ account.name }} ({{ account.id }})</h2>
+              <h2 :id="`account-${index}-title`">{{ account.name }} ({{ account.id }})</h2>
               <p>角色：{{ getRoleName(account.role) }}</p>
               <p>可查看學校：{{ getSchoolsNames(account.schools) }}</p>
               <p>可查看班級：{{ getClassesNames(account.classes) }}</p>
             </ion-label>
             <ion-buttons slot="end">
-              <ion-button @click="openEditAccountModal(index)">
-                <ion-icon slot="icon-only" :icon="createIcon"></ion-icon>
+              <ion-button @click="openEditAccountModal(index)" :aria-label="`編輯 ${account.name}（${account.id}）`" type="button">
+                <ion-icon slot="icon-only" :icon="createIcon" aria-hidden="true"></ion-icon>
               </ion-button>
-              <ion-button color="danger" @click="deleteAccount(index)">
-                <ion-icon slot="icon-only" :icon="trashIcon"></ion-icon>
+              <ion-button color="danger" @click="deleteAccount(index)" :aria-label="`刪除 ${account.name}（${account.id}）`" type="button">
+                <ion-icon slot="icon-only" :icon="trashIcon" aria-hidden="true"></ion-icon>
               </ion-button>
             </ion-buttons>
           </ion-item>
@@ -43,6 +54,7 @@
         :is-open="isModalOpen"
         @didDismiss="closeModal"
         :presenting-element="presentingElement"
+        :aria-label="isEdit ? '編輯帳號' : '新增帳號'"
       >
           <add-edit-account
             :account="currentAccount"
@@ -100,9 +112,6 @@
   
   const searchQuery = ref('');
   const contentId = 'account-list';
-    const accountName = '蘇小鳴';
-    const accountType = '管理員';
-    const version = '1.0.0';
 
   const filteredAccounts = computed(() => {
     if (!searchQuery.value) {
@@ -114,6 +123,8 @@
         account.id.includes(searchQuery.value)
     );
   });
+  
+  const resultsStatus = computed(() => filteredAccounts.value.length ? `共 ${filteredAccounts.value.length} 筆結果` : '無符合結果');
   
   function getRoleName(role) {
     switch (role) {
@@ -134,13 +145,13 @@
   const schoolsData = ref([
     { id: 'school001', name: '師大附中' },
     { id: 'school002', name: '福和國中' },
-    // 更多学校...
+    // 更多學校...
   ]);
   
   const classesData = ref([
-    { id: 'class001', name: '一年级一班' },
-    { id: 'class002', name: '二年级二班' },
-    // 更多班级...
+    { id: 'class001', name: '一年級一班' },
+    { id: 'class002', name: '二年級二班' },
+    // 更多班級...
   ]);
   
   function getSchoolsNames(schoolIds) {
@@ -251,5 +262,22 @@
   
   ion-icon {
     font-size: 20px;
+  }
+
+  :focus-visible {
+    outline: 3px solid #005fcc;
+    outline-offset: 2px;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    margin: -1px;
   }
   </style>
