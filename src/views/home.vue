@@ -14,8 +14,9 @@
       <ion-content :id="contentId" role="main" aria-labelledby="page-title">
         <h1 id="page-title" class="visually-hidden">首頁</h1>
         <ion-grid>
+            <!--
           <ion-row>
-            <!-- 課表 -->
+
             <ion-col size="6">
               <ion-card role="link" tabindex="0" :aria-labelledby="'course-label'"
                 @click="openApp(apps.course.route, {type: 'alignment'})"
@@ -27,7 +28,7 @@
                 </ion-card-content>
               </ion-card>
             </ion-col>
-            <!-- 課程筆記 -->
+ 
             <ion-col size="6">
               <ion-card role="link" tabindex="0" :aria-labelledby="'notes-label'"
                 @click="openApp(apps.notes.route, {type: 'notes'})"
@@ -40,6 +41,7 @@
               </ion-card>
             </ion-col>
           </ion-row>
+        -->
           <ion-row>
             <ion-col size="6">
               <ion-card role="link" tabindex="0" :aria-labelledby="'list-label'"
@@ -64,6 +66,7 @@
                 </ion-card-content>
               </ion-card>
             </ion-col>
+            <!--
             <ion-col size="6">
               <ion-card role="link" tabindex="0" :aria-labelledby="'classes-label'"
                 @click="openApp(apps.classes.route)"
@@ -75,6 +78,7 @@
                 </ion-card-content>
               </ion-card>
             </ion-col>
+        -->
           </ion-row>
         </ion-grid>
       </ion-content>

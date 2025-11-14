@@ -1,5 +1,5 @@
 <template>
-  <ion-menu side="start" :content-id="contentId">
+  <ion-menu side="start" :content-id="contentId" :menu-id="menuId">
     <ion-header>
       <ion-toolbar color="primary">
         <ion-title>選單</ion-title>
@@ -66,6 +66,11 @@ const props = defineProps({
   contentId: {
     type: String,
     required: true,
+  },
+  menuId: {
+    type: String,
+    required: false,
+    default: undefined,
   }
 });
 

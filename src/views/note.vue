@@ -18,11 +18,8 @@
 
         <ion-menu side="end" :content-id="contentId" :menu-id="codesMenuId" type="overlay" style="--width:35%">
             <ion-header>
-                <ion-searchbar placeholder="搜尋編碼或定義" aria-label="搜尋編碼或定義" inputmode="search" enterkeyhint="search" slot="start" @ionInput="filterCodesInEditMenu($event)" :aria-controls="'codes-list'" aria-describedby="codes-status"></ion-searchbar>
-            </ion-header>
-            <ion-content>
                 <p id="codes-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ codesStatus }}</p>
-                <ion-list id="codes-list" role="list" :aria-describedby="'codes-status'">
+                <ion-list id="codes-list" role="list" :aria-describedby="'codes-status'"/>
                 <ion-searchbar placeholder="搜尋編碼或定義" aria-label="搜尋編碼或定義" inputmode="search" enterkeyhint="search" slot="start" @ionInput="filterCodesInEditMenu($event)" :aria-controls="'codes-list'" aria-describedby="codes-status"></ion-searchbar>
             </ion-header>
             <ion-content>

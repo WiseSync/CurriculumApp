@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button menu="listCommonMenu" aria-label="開啟選單"></ion-menu-button>
+                    <ion-menu-button menu="listCommonMenu" aria-label="開啟選單" tabindex="0"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課程列表</ion-title>
 
@@ -20,7 +20,17 @@
             <h1 id="page-title" class="visually-hidden">課程列表</h1>
             <p id="videos-status" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">{{ videosStatus }}</p>
             <IonList id="courses-list" role="list" :aria-describedby="'videos-status'">
-                <IonItem v-for="video in courses" :key="video.id" button="true" @click="onVideoClick(video)" :aria-labelledby="`video-${video.id}-title`">
+                <IonItem
+                    v-for="video in courses"
+                    :key="video.id"
+                    button="true"
+                    @click="onVideoClick(video)"
+                    :aria-labelledby="`video-${video.id}-title`"
+                    tabindex="1"
+                    role="button"
+                    @keyup.enter.prevent="onVideoClick(video)"
+                    @keyup.space.prevent="onVideoClick(video)"
+                >
                     <!-- YouTube Thumbnail -->
                     <IonThumbnail slot="start">
                         <IonImg :src="getThumbnailUrl(video)" :alt="video.title+'的縮圖'" />

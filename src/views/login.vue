@@ -2,7 +2,7 @@
   <ion-page>
     <ion-content class="ion-padding" role="main" aria-labelledby="page-title">
       <div class="welcome-container">
-        <img src="../../assets/logo.png" alt="" class="logo" aria-hidden="true" />
+        <!--<img src="../../assets/logo.png" alt="" class="logo" aria-hidden="true" />-->
         <h1 id="page-title">AI 課綱學習內容表現對齊分析先導系統</h1>
 
         <form @submit.prevent="handleLogin" novalidate aria-describedby="form-error">
