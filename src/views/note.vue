@@ -3,7 +3,7 @@
         <ion-header>
             <ion-toolbar>
                 <ion-buttons slot="start">
-                    <ion-menu-button  :menu="commonMenuId" aria-label="開啟選單"></ion-menu-button>
+                    <ion-menu-button  :menu="commonMenuId" aria-label="開啟選單"  tabindex="0"></ion-menu-button>
                 </ion-buttons>
                 <ion-title>課綱對齊</ion-title>
 

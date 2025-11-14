@@ -1,33 +1,33 @@
 <template>
-  <ion-menu side="start" :content-id="contentId" :menu-id="menuId">
+  <ion-menu side="start" :content-id="contentId" :menu-id="menuId" aria-label="主選單" @ionDidOpen="onMenuDidOpen" @ionDidClose="onMenuDidClose">
     <ion-header>
       <ion-toolbar color="primary">
         <ion-title>選單</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list>
+      <ion-list role="menu">
         <!-- 返回首頁 -->
-        <ion-item button @click="goHome">
-          <ion-icon slot="start" :icon="homeIcon" :alt="returnHomeText" aria-label="returnHomeText"></ion-icon>
+        <ion-item button role="menuitem" tabindex="0" @click="goHome">
+          <ion-icon slot="start" :icon="homeIcon" aria-hidden="true"></ion-icon>
           <ion-label role="text">{{ returnHomeText }}</ion-label>
         </ion-item>
 
         <!-- 使用者資訊 & 登出 -->
         <ion-item v-if="isLoggedIn">
-          <ion-icon slot="start" :icon="personIcon"></ion-icon>
+          <ion-icon slot="start" :icon="personIcon" aria-hidden="true"></ion-icon>
           <ion-label>
             <h2>{{ accountName }}</h2>
           </ion-label>
         </ion-item>
-        <ion-item v-if="isLoggedIn" button @click="handleLogout">
-          <ion-icon slot="start" :icon="logOutIcon"></ion-icon>
+        <ion-item v-if="isLoggedIn" button role="menuitem" tabindex="0" @click="handleLogout">
+          <ion-icon slot="start" :icon="logOutIcon" aria-hidden="true"></ion-icon>
           <ion-label>登出</ion-label>
         </ion-item>
 
         <!-- 版本號 -->
         <ion-item>
-          <ion-icon slot="start" :icon="informationIcon" :alt="versionText" aria-label="versionText"></ion-icon>
+          <ion-icon slot="start" :icon="informationIcon" aria-hidden="true"></ion-icon>
           <ion-label role="text">{{ versionText + ' : ' + version }}</ion-label>
         </ion-item>
       </ion-list>
@@ -47,7 +47,7 @@ import {
   IonIcon,
   IonLabel,
 } from '@ionic/vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { menuController } from '@ionic/vue';
 import {
@@ -97,6 +97,80 @@ function goHome() {
   router.push('/home');
   menuController.close();
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', onGlobalKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onGlobalKeydown);
+});
+
+function onGlobalKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') {
+    return;
+  }
+
+  const activeElement = document.activeElement;
+  if (!activeElement) {
+    return;
+  }
+
+  // 僅當焦點在 ion-menu-button 上，且 menu 屬性對應到這個 component 的 menuId 時才處理
+  if (activeElement.tagName !== 'ION-MENU-BUTTON') {
+    return;
+  }
+
+  const targetMenuId = activeElement.getAttribute('menu');
+
+  if (props.menuId && targetMenuId && targetMenuId !== props.menuId) {
+    return;
+  }
+
+  event.preventDefault();
+  menuController.toggle(props.menuId);
+}
+
+function onMenuDidOpen() {
+  // menu 開啟時，將焦點移到第一個可操作的 menu item
+  setTimeout(() => {
+    let menuSelector = 'ion-menu';
+    if (props.menuId) {
+      menuSelector = `ion-menu[menu-id="${props.menuId}"]`;
+    }
+
+    const menuEl = document.querySelector(menuSelector);
+    if (!menuEl) return;
+
+    const firstItem = menuEl.querySelector('ion-item[button]');
+    if (!firstItem) return;
+
+    // 優先使用 Ionic 提供的 setFocus 方法
+    if (typeof firstItem['setFocus'] === 'function') {
+      firstItem['setFocus']();
+      return;
+    }
+
+    const innerFocusable = firstItem.querySelector('button, [tabindex]:not([tabindex="-1"])');
+    if (innerFocusable && innerFocusable instanceof HTMLElement) {
+      innerFocusable.focus();
+    } else if (firstItem instanceof HTMLElement) {
+      firstItem.focus();
+    }
+  }, 0);
+}
+
+function onMenuDidClose() {
+  // menu 關閉後，把焦點還給對應的 menu button
+  if (!props.menuId) return;
+
+  setTimeout(() => {
+    const triggerButton = document.querySelector(`ion-menu-button[menu="${props.menuId}"]`);
+    if (triggerButton && triggerButton instanceof HTMLElement) {
+      triggerButton.focus();
+    }
+  }, 0);
+}
 </script>
 
 <style scoped>
@@ -106,5 +180,15 @@ ion-menu {
 
 ion-item {
   --min-height: 50px;
+}
+
+ion-item[button] {
+  cursor: pointer;
+}
+
+/* IonItem 內部有 shadow DOM，焦點時會加上 .ion-focused 類別，用這個來畫框 */
+ion-item[button].ion-focused {
+  outline: 3px solid #005fcc;
+  outline-offset: 2px;
 }
 </style>
